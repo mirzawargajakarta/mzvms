@@ -20,7 +20,7 @@ class Frontmenu extends CI_Controller
 		$this->load->view('frontmenu/registration_v', $data);
 	}
 
-	public function readqrcode()
+	public function scanqrcode()
 	{
 		$data['title'] = "Scan QRcode";
 		$this->load->view('frontmenu/qrcodereader_v', $data);
