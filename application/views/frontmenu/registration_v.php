@@ -25,7 +25,9 @@
 	<h4 class="card-title mt-2">Registration</h4>
 </header>
 <article class="card-body">
-<form method="POST" action="<?= base_url('');?>">
+<form method="POST" action="<?= base_url('frontmenu/checkin');?>">
+<input type="hidden" id="newphonenumber" name="newphonenumber" value="1">
+
 	<div class="form-row">
 		<div class="col-md-8">
 			<div id="my_camera"></div>			
@@ -39,28 +41,28 @@
 	<div class="form-row">
 		<div class="form-group col-md-6">
 		  <label>Phone Number</label>
-		  <select id="notelepon" name="phonenumberinput" class="form-control"></select>
+		  <select id="notelepon" name="notelepon" class="form-control"></select>
 		</div>
 	</div> 
 	<div class="form-row">
 		<div class="col form-group col-md-8">
 			<label>Full Nama </label>   
-		  	<input type="text" class="form-control" placeholder="">
+		  	<input type="text" class="form-control" id="fullname" name="fullname" placeholder="">
 		</div> 
 		<div class="col form-group col-md-4">
 			<label>ID Card Number</label>   
-		  	<input type="text" id="" name="" placeholder="" class="form-control">
+		  	<input type="text" id="idcardno" name="idcardno" placeholder="" class="form-control">
 		</div> 
 	</div> 
 
 	<div class="form-row">
 		<div class="form-group col-md-6">
 			<label class="form-check form-check-inline">
-				<input class="form-check-input" type="radio" name="gender" value="option1">
+				<input class="form-check-input" type="radio" id="male" name="gender" value="M">
 				<span class="form-check-label"> Male </span>
 			</label>
 			<label class="form-check form-check-inline">
-				<input class="form-check-input" type="radio" name="gender" value="option2">
+				<input class="form-check-input" type="radio" id="female" name="gender" value="F">
 				<span class="form-check-label"> Female</span>
 			</label>
 		</div> 
@@ -68,18 +70,19 @@
 
 	<div class="form-group">
 		<label>Email address</label>
-		<input type="email" class="form-control" placeholder="">
+		<input type="email" class="form-control" id="email" name="email" placeholder="">
 	</div> 	
 
 	<div class="form-row">
 		<div class="form-group col-md-6">
 			<label>Address</label>
-			<textarea class="form-control" id="" name="" placeholder=""></textarea>
+			<textarea class="form-control" id="address" name="address" placeholder=""></textarea>
 		</div> 
 		<div class="form-group col-md-6">
 		  <label>Country</label>
-		  <select id="negara" class="form-control select2-multiple">
-		  	<option value="ID" selected>Indonesia</option>
+		  <select id="negara" name="negara" class="form-control select2-multiple">
+		  	<option value=""></option>
+		  	<option value="ID">Indonesia</option>
 			<option value="MY">Malaysia</option>
 			<option value="CN">China</option>
 			<option value="IN">India</option>
@@ -97,43 +100,41 @@
 <div class="form-row">
 	<div class="col form-group col-md-6">
 		<label>Company Name</label>   
-		<input type="text" id="" name="" placeholder="" class="form-control">
+		<input type="text" id="company" name="company" placeholder="" class="form-control">
 	</div> 
 	<div class="form-group col-md-6">
 		<label>Company Type</label>
-		<?=form_dropdownDB('companytype', $companytypedata, 'Id', 'SourceTypeName', '', "id='companytype' class='form-control'");?>	
+		<?=form_dropdownDB_init('companytype', $companytypedata, 'Id', 'SourceTypeName', '','','', "id='companytype' class='form-control'");?>	
 	</div> 
 </div> 
 
 <div class="form-row">
 	<div class="col form-group col-md-6">
 		<label>Host Name</label>   
-		<input type="text" id="" name="" placeholder="" class="form-control">
+		<input type="text" id="hostname" name="hostname" placeholder="" class="form-control">
 	</div> 
 	<div class="form-group col-md-6">
 		<label>Department</label>
-		<?=form_dropdownDB('hostdepartment', $hostdepartmentdata, 'Id', 'TargetVisitorType', '', "id='hostdepartment' class='form-control'");?>	
+		<?=form_dropdownDB_init('hostdepartment', $hostdepartmentdata, 'Id', 'TargetVisitorType', '','','', "id='hostdepartment' class='form-control'");?>	
 	</div> 
 </div>
 
 <div class="form-row">
 	<div class="form-group col-md-6">
 		<label>Purpose Visit</label>
-		<?=form_dropdownDB('purpose', $purposedata, 'Id', 'PurposeVisit', '', "id='purpose' class='form-control'");?>	
+		<?=form_dropdownDB_init('purpose', $purposedata, 'Id', 'PurposeVisit', '', '','',"id='purpose' class='form-control'");?>	
 	</div> 
 </div> 
 <!-- ========================================= -->
 	<div class="form-group">
 		<label>Notes</label>
-		<textarea class="form-control" placeholder=""></textarea>
+		<textarea class="form-control" id="notes" name="notes" placeholder=""></textarea>
 		<small class="form-text text-muted">put the notes if you have something to tell</small>
 	</div> 
 
     <div class="form-group">
-        <button type="submit" class="btn btn-primary btn-block">CHECK IN</button>
-    </div> 
-
-    <small class="text-muted">By clicking the 'Sign Up' button, you confirm that you accept our <br> Terms of use and Privacy Policy.</small>                                          
+        <input type="submit" name="submit" value="CHECK IN" class="btn btn-primary btn-block">
+    </div>
 </form>
 </article> 
 
@@ -169,20 +170,66 @@
 			isFreeze = 'N';
 		}
     }
+
+	function addorshow() {
+		// var newphonenumber = $("#newphonenumber").val();
+		// if(newphonenumber==1) {
+
+		// }
+	}
+
 	$(document).ready(function() {
-		let notelepon = [
-                "081398081536", "08111223344556", "081212312345", "085765432181", "088995568415", "0789456123", "0123456789", "098547226", "0845127456", "045561187924",
-                "065428791", "048719642", "07845879156", "0878945197854", "04568740087", "01288785451", "0877544898"
-            ];
+			let notelepon = [ "",
+				<?php 
+					$i = 0;
+					for ($x = 0; $x < count($notelpdata); $x++) {
+						$notelp	= $notelpdata[$x]['PhoneNumber'];
+						if($x>0) {
+							echo ',';
+						}
+						echo '"'.$notelp.'"';
+						if($i==10) {
+							$i=0;
+							echo "\n";
+						}
+						$i++;
+					}
+				?>				
+			];
 
             $("#notelepon").select2({
                 tags: true,
-                placeholder: "Pilih atau tambahkan no.telepon",
+                placeholder: "Choose or Add Phone Number",
                 data: notelepon.map(notelp => ({ id: notelp, text: notelp })),
                 allowClear: true
             });
+
 			$('#notelepon').on("change", function(e) { 
-				// alert($(this).val());
+				var nomortelp = $(this).val();                
+				$.ajax({
+					url: '<?= base_url("frontmenu/getVisitorDetail");?>', 
+					method: 'POST',
+					data: { notelp: nomortelp },
+					dataType: 'json',
+					success: function(data) {
+						var Gender = data.Gender;
+						if(Gender == 'M') {
+							$( "#male" ).prop( "checked", true );
+							$( "#female" ).prop( "checked", false );
+						} else if (Gender == 'F') {
+							$( "#male" ).prop( "checked", false );
+							$( "#female" ).prop( "checked", true );
+						} else {
+							$( "#male" ).prop( "checked", false );
+							$( "#female" ).prop( "checked", false );
+						}
+						$('#newphonenumber').val(data.isNew);
+						$('#fullname').val(data.Nama);						
+						$('#email').val(data.Email);
+						$('#address').val(data.Alamat);
+						$('#idcardno').val(data.IDCard);
+					}				
+				});
 			});
 
 			$('#negara').select2({

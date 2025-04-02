@@ -11,14 +11,18 @@ user_guide_src/cilexer/build/*
 user_guide_src/cilexer/dist/*
 user_guide_src/cilexer/pycilexer.egg-info/*
 
+#editor config
 .vscode/*
-
+/nbproject/
 #codeigniter 3
 application/logs/*
 !application/logs/index.html
 !application/logs/.htaccess
-/nbproject/
 application/cache/
 application/config/database.php
 application/config/config.php
 /vendor/
+#mzvms
+assets/uploads/checkin/*
+assets/uploads/checkout/*
+assets/uploads/qrcode/*
