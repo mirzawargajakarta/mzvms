@@ -28,7 +28,7 @@ class Visiting extends CI_Controller
 	function _getDataIndex()
 	{
 		$sql = "SELECT 
-					d.Id, d.HostName, d.HostCompany, d.IsInside, t.TargetVisitorType, p.PurposeVisit,
+					d.Id, d.HostName, d.SourceCompany, d.IsInside, t.TargetVisitorType, p.PurposeVisit,
 					v.Nama, v.PhoneNumber, s.SourceTypeName
 				FROM visitortrans d, visitormst v, targettypemst t, purposemst p, sourcetypemst s
 				WHERE d.VisitormstId=v.Id AND d.TargettypemstId=t.Id 

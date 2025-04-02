@@ -73,7 +73,7 @@
 			</a>
 		</div>
 		<div class="div" id="readqrcode">
-			<a href="<?= base_url('frontmenu/readqrcode');?>">
+			<a href="<?= base_url('frontmenu/scanqrcode');?>">
 				<p class="p">Scan QR</p>
 			</a>
 		</div>

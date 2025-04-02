@@ -16,8 +16,35 @@ class Frontmenu extends CI_Controller
 
 	public function registration()
 	{
-		$data['title'] = "Form Kontak Registrasi";
+		$data['title'] 				= "Form Kontak Registrasi";
+		$data['hostdepartmentdata']	= $this->_getTargetType();
+		$data['purposedata']		= $this->_getPurpose();
+		$data['companytypedata']	= $this->_getSourceType();
 		$this->load->view('frontmenu/registration_v', $data);
+	}
+
+	function _getTargetType()
+	{
+		$sql = "SELECT Id, TargetVisitorType, TargetVisitorDesc FROM targettypemst ORDER BY TargetVisitorType";
+		$query = $this->db->query($sql);
+		$result = $query->result_array();
+		return $result;
+	}
+
+	function _getPurpose()
+	{
+		$sql = "SELECT Id, PurposeVisit, PurposeDesc FROM purposemst ORDER BY PurposeVisit";
+		$query = $this->db->query($sql);
+		$result = $query->result_array();
+		return $result;
+	}
+
+	function _getSourceType()
+	{
+		$sql = "SELECT Id, SourceTypeName, SourceTypeDesc FROM sourcetypemst ORDER BY SourceTypeName";
+		$query = $this->db->query($sql);
+		$result = $query->result_array();
+		return $result;
 	}
 
 	public function scanqrcode()
