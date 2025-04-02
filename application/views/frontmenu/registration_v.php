@@ -13,7 +13,7 @@
 
 
 <div class="container">
-<br>  <p class="text-center">More bootstrap 4 components on <a href="http://bootstrap-ecommerce.com/"> Petronas</a></p>
+<br>  <p class="text-center"><a href="https://id.pli-petronas.com">PETRONAS</a> Lubricants International (PLI) | Global</p>
 <hr>
 
 
@@ -22,7 +22,7 @@
 <div class="card">
 <header class="card-header">
 	<a href="<?= base_url('frontmenu');?>" class="float-right btn btn-outline-primary mt-1">Back</a>
-	<h4 class="card-title mt-2">Registrasi</h4>
+	<h4 class="card-title mt-2">Registration</h4>
 </header>
 <article class="card-body">
 <form method="POST" action="<?= base_url('');?>">
@@ -130,14 +130,14 @@
 	</div> 
 
     <div class="form-group">
-        <button type="submit" class="btn btn-primary btn-block"> Register  </button>
+        <button type="submit" class="btn btn-primary btn-block">CHECK IN</button>
     </div> 
 
     <small class="text-muted">By clicking the 'Sign Up' button, you confirm that you accept our <br> Terms of use and Privacy Policy.</small>                                          
 </form>
 </article> 
 
-<div class="border-top card-body text-center">Have an account? <a href="">Log In</a></div>
+<div class="border-top card-body text-center">Have an account? <a href="<?= base_url('login')?>">Log In</a></div>
 </div> <!-- card.// -->
 </div> <!-- col.//-->
 
@@ -149,7 +149,7 @@
 <script language="JavaScript">
 	var isFreeze = 'N';
     Webcam.set({
-        width: 460,
+        width: 420,
         height: 320,
         image_format: 'jpeg',
         jpeg_quality: 90
@@ -182,7 +182,7 @@
                 allowClear: true
             });
 			$('#notelepon').on("change", function(e) { 
-				alert($(this).val());
+				// alert($(this).val());
 			});
 
 			$('#negara').select2({
