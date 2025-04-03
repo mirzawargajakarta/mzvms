@@ -1,3 +1,6 @@
+<?php
+$backurl	= base_url('frontmenu');
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,6 +19,6 @@
 	<p>Purpose : <?=$purpose?></p>
 	<img src="<?=$qrimage?>">
 	<p><?=$checkintime_indformat?></p>
-	<p><button onclick="window.print()">Print</button></p>
+	<p><button onclick="window.print()">Print</button><button onclick="window.location.href = '<?=$backurl?>'">Back</button></p>
 </body>
 </html>
