@@ -24,7 +24,7 @@ class Frontmenu extends CI_Controller
 		$this->load->view('frontmenu/registration_v', $data);
 	}
 
-	public function checkin()
+	public function __checkin()
 	{
 		$submit				= $this->input->post('submit');
 		$visitorid			= $this->input->post('visitorid');
@@ -60,7 +60,7 @@ class Frontmenu extends CI_Controller
 
 	}
 
-	public function _checkin()
+	public function checkin()
 	{
 		$submit				= $this->input->post('submit');
 		$visitorid			= $this->input->post('visitorid');
@@ -147,7 +147,7 @@ class Frontmenu extends CI_Controller
 									'PurposemstId'	=> $purpose, 
 									'PVDescription'	=> $notes, 
 									'TempBody'		=> '0.00', 
-									'IsInv'			=> 0, 
+									'IsInv'			=> '0', 
 									'QRCode'		=> $dataqr,
 									'FileCI'		=> $fileName
 								);
