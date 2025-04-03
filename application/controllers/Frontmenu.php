@@ -43,6 +43,42 @@ class Frontmenu extends CI_Controller
 		$purpose			= $this->input->post('purpose');
 		$notes				= $this->input->post('notes');
 		$img				= $this->input->post('image');
+		$datavisitortrans	= array(
+			'IsInside'		=> '1', 
+			'VisitormstId'	=> 2, 
+			'StatusVisit'	=> 'N', 
+			'SourceCompany'	=> $company, 
+			'SourcetypemstId'=> $companytype, 
+			'HostName'		=> $hostname, 
+			'TargettypemstId'=> $hostdepartment, 
+			'PurposemstId'	=> $purpose, 
+			'PVDescription'	=> $notes, 
+			'TempBody'		=> '0.00', 
+			'IsInv'			=> 0
+		);
+		$this->db->insert('visitortrans', $datavisitortrans);
+
+	}
+
+	public function _checkin()
+	{
+		$submit				= $this->input->post('submit');
+		$visitorid			= $this->input->post('visitorid');
+		$isnewphonenumber	= $this->input->post('newphonenumber');
+		$notelepon			= $this->input->post('notelepon');
+		$fullname			= $this->input->post('fullname');
+		$idcardno			= $this->input->post('idcardno');
+		$gender				= $this->input->post('gender');
+		$email				= $this->input->post('email');
+		$address			= $this->input->post('address');
+		$negara				= $this->input->post('negara');
+		$company			= $this->input->post('company');
+		$companytype		= $this->input->post('companytype');
+		$hostname			= $this->input->post('hostname');
+		$hostdepartment		= $this->input->post('hostdepartment');
+		$purpose			= $this->input->post('purpose');
+		$notes				= $this->input->post('notes');
+		$img				= $this->input->post('image');
 
 		$checkintime			= date("Y-m-d H:i:s");
 		$checkintime_indformat	= date("j M Y H:i:s");
@@ -98,6 +134,7 @@ class Frontmenu extends CI_Controller
 			} else {
 				$this->db->update('visitormst', $datavisitormaster, array('Id'	=> $visitorid));
 			}
+
 			$datavisitortrans	= array(
 									'CheckInTime'	=> $checkintime, 
 									'IsInside'		=> '1', 
