@@ -147,7 +147,7 @@ class Frontmenu extends CI_Controller
 									'PurposemstId'	=> $purpose, 
 									'PVDescription'	=> $notes, 
 									'TempBody'		=> '0.00', 
-									'IsInv'			=> '0', 
+									'IsInv'			=> 0, 
 									'QRCode'		=> $dataqr,
 									'FileCI'		=> $fileName
 								);
