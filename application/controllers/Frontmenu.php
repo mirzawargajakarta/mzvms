@@ -24,40 +24,29 @@ class Frontmenu extends CI_Controller
 		$this->load->view('frontmenu/registration_v', $data);
 	}
 
-	public function __checkin()
+	public function test()
 	{
-		$submit				= $this->input->post('submit');
-		$visitorid			= $this->input->post('visitorid');
-		$isnewphonenumber	= $this->input->post('newphonenumber');
-		$notelepon			= $this->input->post('notelepon');
-		$fullname			= $this->input->post('fullname');
-		$idcardno			= $this->input->post('idcardno');
-		$gender				= $this->input->post('gender');
-		$email				= $this->input->post('email');
-		$address			= $this->input->post('address');
-		$negara				= $this->input->post('negara');
-		$company			= $this->input->post('company');
-		$companytype		= $this->input->post('companytype');
-		$hostname			= $this->input->post('hostname');
-		$hostdepartment		= $this->input->post('hostdepartment');
-		$purpose			= $this->input->post('purpose');
-		$notes				= $this->input->post('notes');
-		$img				= $this->input->post('image');
-		$datavisitortrans	= array(
-			'IsInside'		=> '1', 
-			'VisitormstId'	=> 2, 
-			'StatusVisit'	=> 'N', 
-			'SourceCompany'	=> $company, 
-			'SourcetypemstId'=> $companytype, 
-			'HostName'		=> $hostname, 
-			'TargettypemstId'=> $hostdepartment, 
-			'PurposemstId'	=> $purpose, 
-			'PVDescription'	=> $notes, 
-			'TempBody'		=> '0.00', 
-			'IsInv'			=> 0
-		);
-		$this->db->insert('visitortrans', $datavisitortrans);
+		$purpose = 2;
+		$hostdepartment = 3;
 
+		$purposeNhostdepartment	= $this->_getPurposeNHostDept($purpose, $hostdepartment);
+			$purpose_str			= $purposeNhostdepartment['PurposeVisit'];
+			$hostdept_str			= $purposeNhostdepartment['TargetVisitorType'];
+			$checkintime_indformat	= date("j M Y H:i:s");
+			$qrimage_name			= 'QR20250403_162505_85795194565.png';
+			
+			$data['nama']		= 'Ahmadun Testdoang';
+			$data['gender']		=  'M';
+			$data['notelp']		= '81398081536';
+			$data['alamat']		= 'Jalan Bango Cilandak';
+			$data['noidcard']	= '5172341231234.1230';
+			$data['company']	= 'PT. ABc Defgh';
+			$data['hostname']	= 'Sendi Komplek';
+			$data['target']		= $hostdept_str;
+			$data['purpose']	= $purpose_str;
+			$data['checkintime_indformat']	= $checkintime_indformat;
+			$data['qrimage']	= base_url('assets/uploads/qrcode/').$qrimage_name;
+			$this->load->view('frontmenu/printqr_v', $data);
 	}
 
 	public function checkin()
