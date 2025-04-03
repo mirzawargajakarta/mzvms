@@ -59,9 +59,11 @@
                 ++countResults;
                 lastResult = decodedText;
                 // Handle on success condition with the decoded message.
-                console.log(`Scan result ${decodedText}`, decodedResult);
+                // console.log(`Scan result ${decodedText}`, decodedResult);
             }
-			$("#hasilresult").html(decodedText);
+			// $("#hasilresult").html(decodedText);
+			<?php $backurl	= base_url('frontmenu/testa/'); ?>
+			window.location.href = '<?=$backurl?>'+decodedText;
         }
 
         var html5QrcodeScanner = new Html5QrcodeScanner(

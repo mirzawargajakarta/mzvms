@@ -24,6 +24,11 @@ class Frontmenu extends CI_Controller
 		$this->load->view('frontmenu/registration_v', $data);
 	}
 
+	public function testa($qr)
+	{
+		echo $qr;
+	}
+
 	public function test()
 	{
 		$purpose = 2;
