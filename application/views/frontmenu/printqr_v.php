@@ -6,6 +6,21 @@ $backurl	= base_url('frontmenu');
 <head>
     <meta charset="UTF-8">
     <title>PrintQR</title>
+	<style>
+		@media print {
+			.pe-no-print {
+				display: none !important;
+			}
+
+			.pe-preserve-ancestor {
+				display: block !important;
+				margin: 0 !important;
+				padding: 0 !important;
+				border: none !important;
+				box-shadow: none !important;
+			}
+		}
+	</style>
 </head>
 <body>
 <h2>PETRONAS</h2>
@@ -19,6 +34,6 @@ $backurl	= base_url('frontmenu');
 	<p>Purpose : <?=$purpose?></p>
 	<img src="<?=$qrimage?>">
 	<p><?=$checkintime_indformat?></p>
-	<p><button onclick="window.print()">Print</button><button onclick="window.location.href = '<?=$backurl?>'">Back</button></p>
+	<p class="pe-no-print"><button onclick="window.print()">Print</button>&nbsp;&nbsp;<button onclick="window.location.href = '<?=$backurl?>'">Back</button></p>
 </body>
 </html>
