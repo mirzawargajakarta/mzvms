@@ -44,10 +44,11 @@ class Frontmenu extends CI_Controller
 		$notes				= $this->input->post('notes');
 		$img				= $this->input->post('image');
 
-		$checkintime		= date("Y-m-d H:i:s");
+		$checkintime			= date("Y-m-d H:i:s");
+		$checkintime_indformat	= date("j M Y H:i:s");
+		$now					= date("Ymd_His");
 		if($submit) {			
-			//--- SIMPAN FILE GAMBAR di FOLDER
-			$now			= date("Ymd_His");
+			//--- SIMPAN FILE GAMBAR di FOLDER			
 			$folderPath		= FCPATH."assets/uploads/checkin/";	
 			$image_parts	= explode(";base64,", $img);
 			if(isset($image_parts[1])) {
@@ -117,16 +118,25 @@ class Frontmenu extends CI_Controller
 
 			$this->db->trans_complete(); //--END TRANSAKSI
 			//---eo SIMPPAN DATA...-------------------
-
-		$data['nama']		= $fullname;
-		$data['gender']		= $gender;
-		$data['notelp']		= $notelepon;
-		$data['qrimage']	= base_url('assets/uploads/qrcode/').$qrimage_name;
-		$this->load->view('frontmenu/printqr_v', $data);
+			$purposeNhostdepartment	= $this->_getPurposeNHostDept($purpose, $hostdepartment);
+			$purpose_str			= $purposeNhostdepartment['PurposeVisit'];
+			$hostdept_str			= $purposeNhostdepartment['TargetVisitorType'];
+			
+			$data['nama']		= $fullname;
+			$data['gender']		= $gender;
+			$data['notelp']		= $notelepon;
+			$data['alamat']		= $address;
+			$data['noidcard']	= $idcardno;
+			$data['company']	= $company;
+			$data['hostname']	= $hostname;
+			$data['target']		= $hostdept_str;
+			$data['purpose']	= $purpose_str;
+			$data['checkintime_indformat']	= $checkintime_indformat;
+			$data['qrimage']	= base_url('assets/uploads/qrcode/').$qrimage_name;
+			$this->load->view('frontmenu/printqr_v', $data);
 		} else {
 			echo "ERROR PADA PROSES SIMPAN DATA... DATA TIDAK DAPAT DISIMPAN";
 		}
-
 
 	}
 
@@ -151,6 +161,14 @@ class Frontmenu extends CI_Controller
 		}
 		echo json_encode($retval);
 
+	}
+
+	function _getPurposeNHostDept($purpose, $hostdepartment)
+	{
+		$sql = "SELECT t.TargetVisitorType, p.PurposeVisit FROM purposemst p, targettypemst t WHERE t.Id='$hostdepartment' AND p.Id='$purpose'";
+		$query = $this->db->query($sql);
+		$result = $query->result_array();
+		return $result[0];
 	}
 
 	function _getPhoneNumber()

@@ -7,19 +7,15 @@
 <body>
 <h2>PETRONAS</h2>
 <h3>VISITOR RECEIPT</h3>
-	<table>		
-		<tr>
-			<td><?=$nama?></td><td> (<?=$gendertxt = ($gender=='M')?'MALE':'FEMALE';?>)</td>
-		</tr>
-		<tr>
-			<td><?=$notelp?></td><td>&nbsp;</td>
-		</tr>
-		<tr>
-			<td colspan="2">
-				<img src="<?=$qrimage?>">
-			</td>
-		</tr>
-	</table>
-	<button onclick="window.print()">Print</button>
+	<p><?=$nama?> (<?=$gendertxt = ($gender=='M')?'MALE':'FEMALE';?>)</p>
+	<p><?=$notelp?></p>
+	<p><?=$alamat?></p>
+	<p><?=$noidcard?></p>
+	<p><?=$company?></p>
+	<p>Host : <?=$hostname?> (<?=$target?>)</p>
+	<p>Purpose : <?=$purpose?></p>
+	<img src="<?=$qrimage?>">
+	<p><?=$checkintime_indformat?></p>
+	<p><button onclick="window.print()">Print</button></p>
 </body>
 </html>
