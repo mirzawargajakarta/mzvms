@@ -81,7 +81,7 @@ class Frontmenu extends CI_Controller
 			//======eo BUAT QRCODE...===========================
 			
 			//-------------SIMPAN DATA --------------
-			$this->db->trans_start(); //-START TRANSAKSI 
+			// $this->db->trans_start(); //-START TRANSAKSI 
 
 			$datavisitormaster	= array(
 				'Nama'			=> $fullname,
@@ -116,7 +116,7 @@ class Frontmenu extends CI_Controller
 								);
 			$this->db->insert('visitortrans', $datavisitortrans);			
 
-			$this->db->trans_complete(); //--END TRANSAKSI
+			// $this->db->trans_complete(); //--END TRANSAKSI
 			//---eo SIMPPAN DATA...-------------------
 			$purposeNhostdepartment	= $this->_getPurposeNHostDept($purpose, $hostdepartment);
 			$purpose_str			= $purposeNhostdepartment['PurposeVisit'];
