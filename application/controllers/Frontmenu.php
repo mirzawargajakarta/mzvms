@@ -27,6 +27,7 @@ class Frontmenu extends CI_Controller
 	public function checkin()
 	{
 		$submit				= $this->input->post('submit');
+		$visitorid			= $this->input->post('visitorid');
 		$isnewphonenumber	= $this->input->post('newphonenumber');
 		$notelepon			= $this->input->post('notelepon');
 		$fullname			= $this->input->post('fullname');
@@ -42,52 +43,89 @@ class Frontmenu extends CI_Controller
 		$purpose			= $this->input->post('purpose');
 		$notes				= $this->input->post('notes');
 		$img				= $this->input->post('image');
-		// $asdf	= $this->input->post('');
 
-		//--- SIMPAN FILE GAMBAR di FOLDER
-		$folderPath		= FCPATH."assets/uploads/checkin/";	
-		$image_parts	= explode(";base64,", $img);
-		if(isset($image_parts[1])) {
-			$image_base64	= base64_decode($image_parts[1]);
+		$checkintime		= date("Y-m-d H:i:s");
+		if($submit) {			
+			//--- SIMPAN FILE GAMBAR di FOLDER
 			$now			= date("Ymd_His");
-			$fileName		= 'IN'.$now.'_'.$notelepon.'.png';	
-			$file			= $folderPath . $fileName;
-			file_put_contents($file, $image_base64);
-		} else {
-			$fileName		= '';
-		}
-		//-- eo SIMPAN FILE GAMBAR...
-//==============================
-		$nim = 'VS20250403_010203_081398081536';
-		$this->load->library('ciqrcode'); //pemanggilan library QR CODE
-		$qrfolder				= FCPATH."assets/uploads/qrcode/";
-		$config['cacheable']    = true; //boolean, the default is true
-		$config['imagedir']     = $qrfolder; //direktori penyimpanan qr code
-		$config['quality']      = true; //boolean, the default is true
-		$config['size']         = '1024'; //interger, the default is 1024
-		$config['black']        = array(224, 255, 255); // array, default is array(255,255,255)
-		$config['white']        = array(70, 130, 180); // array, default is array(0,0,0)
-		$this->ciqrcode->initialize($config);
+			$folderPath		= FCPATH."assets/uploads/checkin/";	
+			$image_parts	= explode(";base64,", $img);
+			if(isset($image_parts[1])) {
+				$image_base64	= base64_decode($image_parts[1]);			
+				$fileName		= 'CI'.$now.'_'.$notelepon.'.png';	
+				$file			= $folderPath . $fileName;
+				file_put_contents($file, $image_base64);
+			} else {
+				$fileName		= '';
+			}
+			//-- eo SIMPAN FILE GAMBAR...
+			//=====BUAT QRCODE=============
+			$dataqr = 'VS'.$now.'_'.$notelepon;
+			$this->load->library('ciqrcode');
+			$qrfolder				= FCPATH."assets/uploads/qrcode/";
+			$config['cacheable']    = true;
+			$config['imagedir']     = $qrfolder;
+			$config['quality']      = true;
+			$config['size']         = '1024';
+			$config['black']        = array(224, 255, 255);
+			$config['white']        = array(70, 130, 180);
+			$this->ciqrcode->initialize($config);
 
-		$qrimage_name = 'QR20250403_010203.png';
-		$params['data'] = $nim; //data yang akan di jadikan QR CODE
-		$params['level'] = 'H'; //H=High
-		$params['size'] = 4;
-		$params['savename'] = $qrfolder . $qrimage_name; //simpan image QR CODE ke folder publicfolder/qrcode/images/
-		$this->ciqrcode->generate($params); // fungsi untuk generate QR CODE
-//=================================
-		
+			$qrimage_name		= 'QR'.$now.'_'.$notelepon.'.png';
+			$params['data'] 	= $dataqr;
+			$params['level'] 	= 'H'; //H=High Quality
+			$params['size'] 	= 4;
+			$params['savename'] = $qrfolder . $qrimage_name;
+			$this->ciqrcode->generate($params);
+			//======eo BUAT QRCODE...===========================
+			
+			//-------------SIMPAN DATA --------------
+			$this->db->trans_start(); //-START TRANSAKSI 
+
+			$datavisitormaster	= array(
+				'Nama'			=> $fullname,
+				'Gender'		=> $gender,
+				'PhoneNumber'	=> $notelepon,
+				'Email'			=> $email,
+				'IDCard'		=> $idcardno,
+				'Alamat'		=> $address,
+				'Negara'		=> $negara
+			);
+			if($isnewphonenumber) {
+				$this->db->insert('visitormst', $datavisitormaster);
+				$visitorid	= $this->_getLastInsertID();
+			} else {
+				$this->db->update('visitormst', $datavisitormaster, array('Id'	=> $visitorid));
+			}
+			$datavisitortrans	= array(
+									'CheckInTime'	=> $checkintime, 
+									'IsInside'		=> '1', 
+									'VisitormstId'	=> $visitorid, 
+									'StatusVisit'	=> 'N', 
+									'SourceCompany'	=> $company, 
+									'SourcetypemstId'=> $companytype, 
+									'HostName'		=> $hostname, 
+									'TargettypemstId'=> $hostdepartment, 
+									'PurposemstId'	=> $purpose, 
+									'PVDescription'	=> $notes, 
+									'TempBody'		=> '0.00', 
+									'IsInv'			=> 0, 
+									'QRCode'		=> $dataqr,
+									'FileCI'		=> $fileName
+								);
+			$this->db->insert('visitortrans', $datavisitortrans);			
+
+			$this->db->trans_complete(); //--END TRANSAKSI
+			//---eo SIMPPAN DATA...-------------------
+
 		$data['nama']		= $fullname;
 		$data['gender']		= $gender;
 		$data['notelp']		= $notelepon;
 		$data['qrimage']	= base_url('assets/uploads/qrcode/').$qrimage_name;
 		$this->load->view('frontmenu/printqr_v', $data);
-
-		// if($submit) {
-		// 	echo "ok";
-		// } else {
-		// 	echo "haah";
-		// }
+		} else {
+			echo "ERROR PADA PROSES SIMPAN DATA... DATA TIDAK DAPAT DISIMPAN";
+		}
 
 
 	}
@@ -151,5 +189,13 @@ class Frontmenu extends CI_Controller
 	{
 		$data['title'] = "Scan QRcode";
 		$this->load->view('frontmenu/qrcodereader_v', $data);
+	}
+
+	function _getLastInsertID()
+	{
+		$sql	= "SELECT LAST_INSERT_ID() AS lii";
+		$query = $this->db->query($sql);
+		$result = $query->result_array();
+		return $result[0]['lii'];
 	}
 }

@@ -26,6 +26,7 @@
 </header>
 <article class="card-body">
 <form method="POST" action="<?= base_url('frontmenu/checkin');?>">
+<input type="hidden" id="visitorid" name="visitorid" value="N">
 <input type="hidden" id="newphonenumber" name="newphonenumber" value="1">
 
 	<div class="form-row">
@@ -228,6 +229,7 @@
 						$('#email').val(data.Email);
 						$('#address').val(data.Alamat);
 						$('#idcardno').val(data.IDCard);
+						$('#visitorid').val(data.Id);
 					}				
 				});
 			});
