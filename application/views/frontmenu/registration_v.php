@@ -93,6 +93,9 @@
 			<option value="SG">Singapura</option>
 			<option value="TH">Thailand</option>
 			<option value="VN">Vietnam</option>
+			<option value="AUS">Australia</option>
+			<option value="US">America</option>
+			<option value="UEA">UEA</option>
 		  </select>
 		</div> 
 	</div> 
