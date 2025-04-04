@@ -156,7 +156,7 @@
         width: 420,
         height: 320,
         image_format: 'jpeg',
-		constraints: { facingMode: environment },
+		constraints :{  facingMode:'environment' },
         jpeg_quality: 90
     });
   
