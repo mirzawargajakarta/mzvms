@@ -156,7 +156,7 @@
         width: 420,
         height: 320,
         image_format: 'jpeg',
-		constraints :{  facingMode:'environment' },
+		constraints :{  facingMode:'user' }, //using 'environment' instead of 'user'' to use rear camera for mobile phone
         jpeg_quality: 90
     });
   
