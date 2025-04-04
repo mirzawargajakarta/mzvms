@@ -225,6 +225,7 @@
 						$('#address').val(data.Alamat);
 						$('#idcardno').val(data.IDCard);
 						$('#visitorid').val(data.Id);
+						$('#negara').val(data.Negara).change();
 					}				
 				});
 			});

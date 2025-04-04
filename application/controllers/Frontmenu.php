@@ -174,7 +174,7 @@ class Frontmenu extends CI_Controller
 	public function getVisitorDetail()
 	{
 		$notelp	= $this->input->post('notelp');
-		$sql = "SELECT Id, Nama, Gender, PhoneNumber, Email, Alamat, IDCard FROM visitormst WHERE PhoneNumber='$notelp'";
+		$sql = "SELECT Id, Nama, Gender, PhoneNumber, Email, Alamat, IDCard, Negara FROM visitormst WHERE PhoneNumber='$notelp'";
 		$query = $this->db->query($sql);
 		$result = $query->result_array();
 		if(isset($result[0])) {
@@ -189,6 +189,7 @@ class Frontmenu extends CI_Controller
 			$retval['Email'] = null;
 			$retval['Alamat'] = null;
 			$retval['IDCard'] = null;
+			$retval['Negara'] = null;
 		}
 		echo json_encode($retval);
 
