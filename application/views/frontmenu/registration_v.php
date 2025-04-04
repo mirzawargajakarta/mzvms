@@ -42,7 +42,7 @@
 	<div class="form-row">
 		<div class="form-group col-md-6">
 		  <label>Phone Number</label>
-		  <select id="notelepon" name="notelepon" class="form-control"></select>
+		  <input type="text" id="notelepon" name="notelepon" class="form-control" placeholder="">
 		</div>
 	</div> 
 	<div class="form-row">
@@ -198,14 +198,9 @@
 				?>				
 			];
 
-            $("#notelepon").select2({
-                tags: true,
-                placeholder: "Choose or Add Phone Number",
-                data: notelepon.map(notelp => ({ id: notelp, text: notelp })),
-                allowClear: true
-            });
+            $("#notelepon").focus();
 
-			$('#notelepon').on("change", function(e) { 
+			$('#notelepon').on("blur", function(e) { 
 				var nomortelp = $(this).val();                
 				$.ajax({
 					url: '<?= base_url("frontmenu/getVisitorDetail");?>', 
