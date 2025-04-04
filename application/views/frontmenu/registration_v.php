@@ -156,6 +156,7 @@
         width: 420,
         height: 320,
         image_format: 'jpeg',
+		facingMode:'environment',
         jpeg_quality: 90
     });
   
@@ -182,23 +183,23 @@
         });
 
 	$(document).ready(function() {
-			let notelepon = [ "",
-				<?php 
-					$i = 0;
-					for ($x = 0; $x < count($notelpdata); $x++) {
-						$notelp	= $notelpdata[$x]['PhoneNumber'];
-						if($x>0) {
-							echo ',';
-						}
-						echo '"'.$notelp.'"';
-						if($i==10) {
-							$i=0;
-							echo "\n";
-						}
-						$i++;
-					}
-				?>				
-			];
+			// let notelepon = [ "",
+				// <?php 
+				// 	$i = 0;
+				// 	for ($x = 0; $x < count($notelpdata); $x++) {
+				// 		$notelp	= $notelpdata[$x]['PhoneNumber'];
+				// 		if($x>0) {
+				// 			echo ',';
+				// 		}
+				// 		echo '"'.$notelp.'"';
+				// 		if($i==10) {
+				// 			$i=0;
+				// 			echo "\n";
+				// 		}
+				// 		$i++;
+				// 	}
+				// ?>				
+			// ];
 
             $("#notelepon").focus();
 
