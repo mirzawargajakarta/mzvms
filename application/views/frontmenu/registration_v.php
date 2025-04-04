@@ -42,7 +42,7 @@
 	<div class="form-row">
 		<div class="form-group col-md-6">
 		  <label>Phone Number</label>
-		  <input type="text" id="notelepon" name="notelepon" class="form-control" placeholder="">
+		  <input type="text" id="notelepon" name="notelepon" class="form-control allownumericwithoutdecimal" placeholder="">
 		</div>
 	</div> 
 	<div class="form-row">
@@ -87,15 +87,14 @@
 			<option value="MY">Malaysia</option>
 			<option value="CN">China</option>
 			<option value="IN">India</option>
-			<option value="JP">Jepang</option>
-			<option value="KR">Korea Selatan</option>			
-			<option value="PH">Filipina</option>
-			<option value="SG">Singapura</option>
+			<option value="JP">Japan</option>
+			<option value="KR">South Korea</option>
+			<option value="SG">Singapore</option>
 			<option value="TH">Thailand</option>
-			<option value="VN">Vietnam</option>
-			<option value="AUS">Australia</option>
+			<option value="AU">Australia</option>
 			<option value="US">America</option>
-			<option value="UEA">UEA</option>
+			<option value="AE">Arab Emirates Union</option>
+			<option value="GB">England</option>
 		  </select>
 		</div> 
 	</div> 
@@ -175,12 +174,12 @@
 		}
     }
 
-	function addorshow() {
-		// var newphonenumber = $("#newphonenumber").val();
-		// if(newphonenumber==1) {
-
-		// }
-	}
+	$(".allownumericwithoutdecimal").on("keypress keyup blur",function (event) {    
+           $(this).val($(this).val().replace(/[^\d].+/, ""));
+            if ((event.which < 48 || event.which > 57)) {
+                event.preventDefault();
+            }
+        });
 
 	$(document).ready(function() {
 			let notelepon = [ "",
