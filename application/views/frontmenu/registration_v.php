@@ -93,7 +93,7 @@
 			<option value="TH">Thailand</option>
 			<option value="AU">Australia</option>
 			<option value="US">America</option>
-			<option value="AE">Arab Emirates Union</option>
+			<option value="AE">United Arab Emirates</option>
 			<option value="GB">England</option>
 		  </select>
 		</div> 

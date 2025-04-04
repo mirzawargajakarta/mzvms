@@ -63,8 +63,9 @@
                 // console.log(`Scan result ${decodedText}`, decodedResult);
             }
 			// $("#hasilresult").html(decodedText);
-			<?php $backurl	= base_url('frontmenu/testa/'); ?>
-			window.location.href = '<?=$backurl?>'+decodedText;
+			<?php $backurl	= base_url('frontmenu/scanproc/?qrcode='); ?>
+			var uriencode = encodeURI(decodedText);
+			window.location.href = '<?=$backurl?>'+uriencode;
         }
 
         var html5QrcodeScanner = new Html5QrcodeScanner(

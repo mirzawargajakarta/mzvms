@@ -24,9 +24,92 @@ class Frontmenu extends CI_Controller
 		$this->load->view('frontmenu/registration_v', $data);
 	}
 
-	public function testa($qr)
+	public function scanproc()
 	{
-		echo $qr;
+		// $qr					= $this->input->get('qrcode');
+		// $qrcode 			= urldecode($qr);
+		$qrcode	= '123456';
+
+		$visitransdata		= $this->_getVisittransData($qrcode);
+		$idvistrans			= $visitransdata['Id'];
+		$isInvitation		= $visitransdata['IsInv'];
+		$statusVisitedInv   = $visitransdata['StatusVisit'];
+		$isInside			= $visitransdata['IsInside'];
+		
+		if(!is_null($idvistrans)) {
+			//undangan
+			if($isInvitation==1 AND $isInside==0 AND $statusVisitedInv=='N') {
+				// invitation_checkin_page
+			}
+
+			if($isInvitation==1 AND $isInside==1 AND $statusVisitedInv=='Y') {
+				// checkout_page
+				$this->_checkoutpage($idvistrans);
+			}
+
+			if($isInvitation==1 AND $isInside==0 AND $statusVisitedInv=='Y') {
+				// tiket / undangan sudah di checkout
+			}
+
+			//non undangan
+			if($isInvitation==0 AND $isInside==1) {
+				// checkout_page
+				$this->_checkoutpage($idvistrans);
+			}
+
+			if($isInvitation==0 AND $isInside==0) {
+				// tiket / undangan sudah di checkout
+			}
+		} else {
+			//data tidak ditemukan
+		}
+	}
+
+	function _checkoutpage($idvistrans)
+	{
+		$datadtl	= $this->_getVisitorTransDetail($idvistrans);
+		$data['fullname']	= $datadtl['Nama'];
+		$data['phone']	= $datadtl['PhoneNumber'];
+		$data['ciimg']	= $datadtl['FileCI'];
+		
+		$this->load->view('frontmenu/checkout_v', $data);
+	}
+
+	function _getVisitorTransDetail($idvistrans)
+	{
+		$sql = "SELECT 	
+				t.Id, t.CheckInTime, t.CheckOutTime, t.IsInside, t.VisitormstId, 
+				t.SourceCompany, t.SourcetypemstId, t.HostName, t.TargettypemstId, 
+				t.PurposemstId, t.PVDescription, t.TempBody, t.AppointmentDate, 
+				t.StatusVisit, t.IsInv, t.QRCode, t.FileCI,
+				v.Nama, v.Gender, v.PhoneNumber, v.Email, 
+				v.Alamat, v.IDCard, v.FileIDCard,
+				p.PurposeVisit, s.SourceTypeName, r.TargetVisitorType
+			FROM 
+				visitortrans t, visitormst v, purposemst p, sourcetypemst s,
+				targettypemst r
+			WHERE 
+				t.VisitormstId=v.Id AND t.SourcetypemstId=s.Id AND t.PurposemstId=p.Id 
+				AND t.TargettypemstId=r.Id AND t.Id='$idvistrans'";
+		$query = $this->db->query($sql);
+		$result = $query->result_array();
+		return $result[0];
+	}
+
+	function _getVisittransData($qrcode)
+	{
+		$sql = "SELECT Id, IsInside, StatusVisit, IsInv FROM visitortrans WHERE QRCode='$qrcode'";
+		$query = $this->db->query($sql);
+		$result = $query->result_array();
+		if(isset($result[0])) {
+			$retval = $result[0];
+		} else {
+			$retval['Id'] = null;
+			$retval['IsInside'] = null;
+			$retval['StatusVisit'] = null;
+			$retval['IsInv'] = null;
+		}
+		return $retval;
 	}
 
 	public function test()
@@ -111,7 +194,7 @@ class Frontmenu extends CI_Controller
 			//======eo BUAT QRCODE...===========================
 			
 			//-------------SIMPAN DATA --------------
-			// $this->db->trans_start(); //-START TRANSAKSI 
+			$this->db->trans_start(); //-START TRANSAKSI 
 
 			$datavisitormaster	= array(
 				'Nama'			=> $fullname,
@@ -131,9 +214,9 @@ class Frontmenu extends CI_Controller
 
 			$datavisitortrans	= array(
 									'CheckInTime'	=> $checkintime, 
-									'IsInside'		=> '1', 
+									'IsInside'		=> 1, 
 									'VisitormstId'	=> $visitorid, 
-									'StatusVisit'	=> 'N', 
+									'StatusVisit'	=> 'N', //N -> Undangan belum ada kunjungan, Y -> Undangan sudah ada kunjungan 
 									'SourceCompany'	=> $company, 
 									'SourcetypemstId'=> $companytype, 
 									'HostName'		=> $hostname, 
@@ -147,7 +230,7 @@ class Frontmenu extends CI_Controller
 								);
 			$this->db->insert('visitortrans', $datavisitortrans);			
 
-			// $this->db->trans_complete(); //--END TRANSAKSI
+			$this->db->trans_complete(); //--END TRANSAKSI
 			//---eo SIMPPAN DATA...-------------------
 			$purposeNhostdepartment	= $this->_getPurposeNHostDept($purpose, $hostdepartment);
 			$purpose_str			= $purposeNhostdepartment['PurposeVisit'];
