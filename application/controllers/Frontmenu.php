@@ -26,9 +26,9 @@ class Frontmenu extends CI_Controller
 
 	public function scanproc()
 	{
-		// $qr					= $this->input->get('qrcode');
-		// $qrcode 			= urldecode($qr); //test
-		$qrcode	= '123456';
+		$qr					= $this->input->get('qrcode');
+		$qrcode 			= urldecode($qr);
+		// $qrcode	= '123456';
 
 		$visitransdata		= $this->_getVisittransData($qrcode);
 		$idvistrans			= $visitransdata['Id'];
@@ -65,7 +65,7 @@ class Frontmenu extends CI_Controller
 			}
 		} else {
 			//data tidak ditemukan
-			echo "data tidak ditemukan";
+			echo "data tidak ditemukan".$qrcode;
 		}
 	}
 
