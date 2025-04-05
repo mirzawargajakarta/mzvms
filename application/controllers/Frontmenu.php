@@ -40,6 +40,7 @@ class Frontmenu extends CI_Controller
 			//undangan
 			if($isInvitation==1 AND $isInside==0 AND $statusVisitedInv=='N') {
 				// invitation_checkin_page
+				echo "invitation_checkin_page";
 			}
 
 			if($isInvitation==1 AND $isInside==1 AND $statusVisitedInv=='Y') {
@@ -49,6 +50,7 @@ class Frontmenu extends CI_Controller
 
 			if($isInvitation==1 AND $isInside==0 AND $statusVisitedInv=='Y') {
 				// tiket / undangan sudah di checkout
+				echo "tiket / undangan sudah di checkout";
 			}
 
 			//non undangan
@@ -59,9 +61,11 @@ class Frontmenu extends CI_Controller
 
 			if($isInvitation==0 AND $isInside==0) {
 				// tiket / undangan sudah di checkout
+				echo "tiket / undangan sudah di checkout";
 			}
 		} else {
 			//data tidak ditemukan
+			echo "data tidak ditemukan";
 		}
 	}
 
