@@ -27,7 +27,10 @@
 	</div>	
 </article> <!-- card-body end .// -->
 
-<div class="border-top card-body text-center">[<div id="hasilresult"></div>]</div>
+<div class="border-top card-body text-center">
+	<!-- [<div id="hasilresult"></div>] -->
+	 Please put the qrcode image on screen box
+</div>
 </div> <!-- card.// -->
 </div> <!-- col.//-->
 	</div>

@@ -49,8 +49,8 @@ class Frontmenu extends CI_Controller
 			}
 
 			if($isInvitation==1 AND $isInside==0 AND $statusVisitedInv=='Y') {
-				// tiket / undangan sudah di checkout
-				echo "tiket / undangan sudah di checkout";
+				// echo "tiket / undangan sudah di checkout";
+				$this->_hascheckedout($idvistrans);
 			}
 
 			//non undangan
@@ -60,8 +60,8 @@ class Frontmenu extends CI_Controller
 			}
 
 			if($isInvitation==0 AND $isInside==0) {
-				// tiket / undangan sudah di checkout
-				echo "tiket / undangan sudah di checkout";
+				// echo "tiket / undangan sudah di checkout";
+				$this->_hascheckedout($idvistrans);
 			}
 		} else {
 			//data tidak ditemukan
@@ -69,14 +69,72 @@ class Frontmenu extends CI_Controller
 		}
 	}
 
+	function _hascheckedout($idvistrans)
+	{
+		$datadtl	= $this->_getVisitorTransDetail($idvistrans);
+
+		$data['idvistrans']	= $idvistrans;		
+		$data['fullname']	= $datadtl['Nama'];
+		$data['phone']		= $datadtl['PhoneNumber'];
+		$data['notes']		= $datadtl['PVDescription'];
+		$data['ciimg']		= $datadtl['FileCI'];
+		$data['coimg']		= $datadtl['FileCO'];
+		$checkintime		= strtotime($datadtl['CheckInTime']);
+		$checkouttime		= strtotime($datadtl['CheckOutTime']);
+
+		$data['checkintimeindformat']		= date( 'j M Y H:i', $checkintime );
+		$data['checkouttimeindformat']		= date( 'j M Y H:i', $checkouttime );
+
+		$this->load->view('frontmenu/hascheckedout_v', $data);
+	}
+
 	function _checkoutpage($idvistrans)
 	{
 		$datadtl	= $this->_getVisitorTransDetail($idvistrans);
+		$data['idvistrans']	= $idvistrans;
 		$data['fullname']	= $datadtl['Nama'];
-		$data['phone']	= $datadtl['PhoneNumber'];
-		$data['ciimg']	= $datadtl['FileCI'];
+		$data['phone']		= $datadtl['PhoneNumber'];
+		$data['notes']		= $datadtl['PVDescription'];
+		$data['ciimg']		= $datadtl['FileCI'];
 		
 		$this->load->view('frontmenu/checkout_v', $data);
+	}
+
+	public function checkout()
+	{
+		$submit		= $this->input->post('submit');
+		$idvistrans	= $this->input->post('idvistrans');
+		$notelepon	= $this->input->post('notelepon');
+		$img		= $this->input->post('image');
+
+		$checkouttime			= date("Y-m-d H:i:s");
+		$now					= date("Ymd_His");
+		if($submit) {			
+			//--- SIMPAN FILE GAMBAR di FOLDER			
+			$folderPath		= FCPATH."assets/uploads/checkout/";	
+			$image_parts	= explode(";base64,", $img);
+			if(isset($image_parts[1])) {
+				$image_base64	= base64_decode($image_parts[1]);			
+				$fileName		= 'CO'.$now.'_'.$notelepon.'.png';	
+				$file			= $folderPath . $fileName;
+				file_put_contents($file, $image_base64);
+			} else {
+				$fileName		= '';
+			}
+			//-- eo SIMPAN FILE GAMBAR...
+
+			$this->db->trans_start(); //-START TRANSAKSI 
+
+			$datavisitortrans	= array(
+				'CheckOutTime'	=> $checkouttime, 
+				'IsInside'		=> 0, 			
+				'FileCO'		=> $fileName
+			);
+			$this->db->update('visitortrans', $datavisitortrans, array('Id'	=> $idvistrans));
+
+			$this->db->trans_complete(); //--END TRANSAKSI
+			echo "Harus nya sudah berhasil checkout";
+		}
 	}
 
 	function _getVisitorTransDetail($idvistrans)
@@ -85,7 +143,7 @@ class Frontmenu extends CI_Controller
 				t.Id, t.CheckInTime, t.CheckOutTime, t.IsInside, t.VisitormstId, 
 				t.SourceCompany, t.SourcetypemstId, t.HostName, t.TargettypemstId, 
 				t.PurposemstId, t.PVDescription, t.TempBody, t.AppointmentDate, 
-				t.StatusVisit, t.IsInv, t.QRCode, t.FileCI,
+				t.StatusVisit, t.IsInv, t.QRCode, t.FileCI, t.FileCO,
 				v.Nama, v.Gender, v.PhoneNumber, v.Email, 
 				v.Alamat, v.IDCard, v.FileIDCard,
 				p.PurposeVisit, s.SourceTypeName, r.TargetVisitorType
