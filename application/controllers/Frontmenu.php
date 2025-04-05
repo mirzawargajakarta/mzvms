@@ -27,7 +27,7 @@ class Frontmenu extends CI_Controller
 	public function scanproc()
 	{
 		// $qr					= $this->input->get('qrcode');
-		// $qrcode 			= urldecode($qr);
+		// $qrcode 			= urldecode($qr); //test
 		$qrcode	= '123456';
 
 		$visitransdata		= $this->_getVisittransData($qrcode);
