@@ -24,6 +24,107 @@ class Frontmenu extends CI_Controller
 		$this->load->view('frontmenu/registration_v', $data);
 	}
 
+	public function confirmprocess()
+	{
+		$submit				= $this->input->post('submit');
+		$visitorid			= $this->input->post('idvisitormst');
+		$visitortransid		= $this->input->post('idvisitortrans');
+		$qrcode				= $this->input->post('qrcode');
+		$notelepon			= $this->input->post('notelepon');
+		$fullname			= $this->input->post('fullname');
+		$idcardno			= $this->input->post('idcardno');
+		$gender				= $this->input->post('gender');
+		$email				= $this->input->post('email');
+		$address			= $this->input->post('address');
+		$negara				= $this->input->post('negara');
+		$company			= $this->input->post('company');
+		$companytype		= $this->input->post('companytype');
+		$img				= $this->input->post('image');//foto idcard
+
+		$checkintime			= date("Y-m-d H:i:s");
+		$checkintime_indformat	= date("j M Y H:i:s");
+		$now					= date("Ymd_His");
+		if($submit) {			
+			//--- SIMPAN FILE GAMBAR di FOLDER			
+			$folderPath		= FCPATH."assets/uploads/idcard/";
+			$image_parts	= explode(";base64,", $img);
+			if(isset($image_parts[1])) {
+				$image_base64	= base64_decode($image_parts[1]);			
+				$fileName		= 'ID_'.$notelepon.'.png';	
+				$file			= $folderPath . $fileName;
+				file_put_contents($file, $image_base64);
+			} else {
+				$fileName		= '';
+			}
+			//----eo SIMPAN FILE IDCARD....
+			//-------------SIMPAN DATA --------------
+			$this->db->trans_start(); //-START TRANSAKSI 
+
+			$datavisitormaster	= array(
+				'Nama'			=> $fullname,
+				'Gender'		=> $gender,
+				'PhoneNumber'	=> $notelepon,
+				'Email'			=> $email,
+				'IDCard'		=> $idcardno,
+				'Alamat'		=> $address,
+				'Negara'		=> $negara,
+				'FileIDCard'	=> $fileName				
+			);
+			$this->db->update('visitormst', $datavisitormaster, array('Id'	=> $visitorid));
+
+			$datavisitortrans	= array(
+				'VisitormstId'	=> $visitorid, 
+				'StatusVisit'	=> 'N', //N -> Undangan belum ada kunjungan, Y -> Undangan sudah ada kunjungan 
+				'SourceCompany'	=> $company,
+				'SourcetypemstId'=> $companytype,
+				'IsInv'			=> 1
+			);
+			$this->db->update('visitortrans', $datavisitortrans, array('Id'	=> $visitortransid));
+
+			$this->db->trans_complete(); //--END TRANSAKSI
+		}
+	}
+
+	public function confirmationpage()
+	{
+		$qr			= $this->input->get('qrcode');//md5 qrcode
+		$qrcode 	= urldecode($qr);
+		$visitransdata		= $this->_getVisittransData($qrcode, true);
+		$idvistrans			= $visitransdata['Id'];
+		$isInvitation		= $visitransdata['IsInv'];
+		$statusVisitedInv   = $visitransdata['StatusVisit'];
+		$isInside			= $visitransdata['IsInside'];
+
+		if(!is_null($idvistrans)) {
+			$datadtl			= $this->_getVisitorTransDetail($idvistrans);
+
+			$confirmationdate	= $datadtl['AppointmentDate'];
+			$today 				= date('Y-m-d');
+			list($mulaiyear, $mulaimonth, $mulaiday) = explode("-", $today);
+			list($akhiryear,$akhirmonth, $akhirday) = explode("-", $confirmationdate);
+			$a = gregoriantojd($mulaimonth, $mulaiday, $mulaiyear);
+			$b = gregoriantojd($akhirmonth, $akhirday, $akhiryear);
+			if($b < $a){
+				echo "we're sorry, the invitation has expired.";
+			} else {
+				//----------------confirmation invitation----- //lom
+				$data['title'] 				= "Form Kontak Registrasi";
+				$data['hostdepartmentdata']	= $this->_getTargetType();
+				$data['purposedata']		= $this->_getPurpose();
+				$data['companytypedata']	= $this->_getSourceType();
+				$data['notelpdata']			= $this->_getPhoneNumber();
+
+				$this->load->view('frontmenu/confirm_page_v', $data);
+				//-----eo checkin ... 
+			}
+		} else {
+			echo "data not found";
+		}
+
+		
+
+	}
+
 	public function scanproc()
 	{
 		$qr					= $this->input->get('qrcode');
@@ -158,9 +259,36 @@ class Frontmenu extends CI_Controller
 		return $result[0];
 	}
 
-	function _getVisittransData($qrcode)
+	function _getVisitorTransDetailByQR($qrcode)
 	{
-		$sql = "SELECT Id, IsInside, StatusVisit, IsInv FROM visitortrans WHERE QRCode='$qrcode'";
+		$sql = "SELECT 	
+				t.Id, t.CheckInTime, DATE_FORMAT(t.CheckInTime,'%e %b %Y %l:%i %p') AS CheckInTimeIndFmt,
+				t.CheckOutTime, t.IsInside, t.VisitormstId, 
+				t.SourceCompany, t.SourcetypemstId, t.HostName, t.TargettypemstId, 
+				t.PurposemstId, t.PVDescription, t.TempBody, t.AppointmentDate, 
+				t.StatusVisit, t.IsInv, t.QRCode, t.FileCI, t.FileCO,
+				v.Nama, v.Gender, v.PhoneNumber, v.Email, 
+				v.Alamat, v.IDCard, v.FileIDCard,
+				p.PurposeVisit, s.SourceTypeName, r.TargetVisitorType
+			FROM 
+				visitortrans t, visitormst v, purposemst p, sourcetypemst s,
+				targettypemst r
+			WHERE 
+				t.VisitormstId=v.Id AND t.SourcetypemstId=s.Id AND t.PurposemstId=p.Id 
+				AND t.TargettypemstId=r.Id AND t.QRCode='$qrcode'";
+		$query = $this->db->query($sql);
+		$result = $query->result_array();
+		return $result[0];
+	}
+
+	function _getVisittransData($qrcode, $ismd5=false)
+	{
+		if($ismd5) {
+			$sql = "SELECT Id, IsInside, StatusVisit, IsInv FROM visitortrans WHERE MD5(QRCode)='$qrcode'";
+		} else {
+			$sql = "SELECT Id, IsInside, StatusVisit, IsInv FROM visitortrans WHERE QRCode='$qrcode'";
+		}
+		
 		$query = $this->db->query($sql);
 		$result = $query->result_array();
 		if(isset($result[0])) {
@@ -176,30 +304,12 @@ class Frontmenu extends CI_Controller
 
 	public function test()
 	{
-		$purpose = 2;
-		$hostdepartment = 3;
+		$data['title']			= 'test';
 
-		$purposeNhostdepartment	= $this->_getPurposeNHostDept($purpose, $hostdepartment);
-			$purpose_str			= $purposeNhostdepartment['PurposeVisit'];
-			$hostdept_str			= $purposeNhostdepartment['TargetVisitorType'];
-			$checkintime_indformat	= date("j M Y H:i:s");
-			$qrimage_name			= 'QR20250403_162505_85795194565.png';
-			
-			$data['nama']		= 'Ahmadun Testdoang';
-			$data['gender']		=  'M';
-			$data['notelp']		= '81398081536';
-			$data['alamat']		= 'Jalan Bango Cilandak';
-			$data['noidcard']	= '5172341231234.1230';
-			$data['company']	= 'PT. ABc Defgh';
-			$data['hostname']	= 'Sendi Komplek';
-			$data['target']		= $hostdept_str;
-			$data['purpose']	= $purpose_str;
-			$data['checkintime_indformat']	= $checkintime_indformat;
-			$data['qrimage']	= base_url('assets/uploads/qrcode/').$qrimage_name;
-			$this->load->view('frontmenu/printqr_v', $data);
+				$this->load->view('frontmenu/confirm_page_v', $data);
 	}
 
-	public function checkin()
+	public function checkin_ori()
 	{
 		$submit				= $this->input->post('submit');
 		$visitorid			= $this->input->post('visitorid');
@@ -312,6 +422,128 @@ class Frontmenu extends CI_Controller
 			$this->load->view('frontmenu/printqr_v', $data);
 		} else {
 			echo "ERROR PADA PROSES SIMPAN DATA... DATA TIDAK DAPAT DISIMPAN";
+		}
+
+	}
+
+	public function printQR()
+	{
+		$qr					= $this->input->get('qrcode');
+		$qrcode 			= urldecode($qr);
+		//=====BUAT QRCODE=============
+		$this->load->library('ciqrcode');
+		$qrfolder				= FCPATH."assets/uploads/qrcode/";
+		$config['cacheable']    = true;
+		$config['imagedir']     = $qrfolder;
+		$config['quality']      = true;
+		$config['size']         = '1024';
+		$config['black']        = array(224, 255, 255);
+		$config['white']        = array(70, 130, 180);
+		$this->ciqrcode->initialize($config);
+
+		$qrimage_name		= 'QR'.$qrcode.'.png';
+		$params['data'] 	= $qrcode;
+		$params['level'] 	= 'H'; //H=High Quality
+		$params['size'] 	= 4;
+		$params['savename'] = $qrfolder . $qrimage_name;
+		$this->ciqrcode->generate($params);
+		//======eo BUAT QRCODE...===========================
+		
+		$visitransdata		= $this->_getVisitorTransDetailByQR($qrcode);
+		$checkintime_indformat = $visitransdata['CheckInTimeIndFmt'];
+		
+		$data['nama']		= $visitransdata['Nama'];
+		$data['gender']		= $visitransdata['Gender'];
+		$data['notelp']		= $visitransdata['PhoneNumber'];
+		$data['alamat']		= $visitransdata['Alamat'];
+		$data['noidcard']	= $visitransdata['IDCard'];
+		$data['company']	= $visitransdata['SourceCompany'];
+		$data['hostname']	= $visitransdata['HostName'];
+		$data['target']		= $visitransdata['TargetVisitorType'];
+		$data['purpose']	= $visitransdata['PurposeVisit'];
+		$data['checkintime_indformat']	= $checkintime_indformat;
+		$data['qrimage']	= base_url('assets/uploads/qrcode/').$qrimage_name;
+		$this->load->view('frontmenu/printqr_v', $data);
+	}
+
+	public function checkin()
+	{
+		$visitorid			= $this->input->post('visitorid');
+		$isnewphonenumber	= $this->input->post('newphonenumber');
+		$notelepon			= $this->input->post('notelepon');
+		$fullname			= $this->input->post('fullname');
+		$idcardno			= $this->input->post('idcardno');
+		$gender				= $this->input->post('gender');
+		$email				= $this->input->post('email');
+		$address			= $this->input->post('address');
+		$negara				= $this->input->post('negara');
+		$company			= $this->input->post('company');
+		$companytype		= $this->input->post('companytype');
+		$hostname			= $this->input->post('hostname');
+		$hostdepartment		= $this->input->post('hostdepartment');
+		$purpose			= $this->input->post('purpose');
+		$notes				= $this->input->post('notes');
+		$img				= $this->input->post('image');
+
+		$checkintime			= date("Y-m-d H:i:s");
+		$checkintime_indformat	= date("j M Y H:i:s");
+		$now					= date("Ymd_His");
+		if(!is_null($notelepon)) {			
+			//--- SIMPAN FILE GAMBAR di FOLDER			
+			$folderPath		= FCPATH."assets/uploads/checkin/";	
+			$image_parts	= explode(";base64,", $img);
+			if(isset($image_parts[1])) {
+				$image_base64	= base64_decode($image_parts[1]);			
+				$fileName		= 'CI'.$now.'_'.$notelepon.'.png';	
+				$file			= $folderPath . $fileName;
+				file_put_contents($file, $image_base64);
+			} else {
+				$fileName		= '';
+			}
+			//-- eo SIMPAN FILE GAMBAR...
+			$dataqr = 'VS'.$now.'_'.$notelepon;			
+			//-------------SIMPAN DATA --------------
+			$this->db->trans_start(); //-START TRANSAKSI 
+
+			$datavisitormaster	= array(
+				'Nama'			=> $fullname,
+				'Gender'		=> $gender,
+				'PhoneNumber'	=> $notelepon,
+				'Email'			=> $email,
+				'IDCard'		=> $idcardno,
+				'Alamat'		=> $address,
+				'Negara'		=> $negara
+			);
+			if($isnewphonenumber) {
+				$this->db->insert('visitormst', $datavisitormaster);
+				$visitorid	= $this->_getLastInsertID();
+			} else {
+				$this->db->update('visitormst', $datavisitormaster, array('Id'	=> $visitorid));
+			}
+
+			$datavisitortrans	= array(
+									'CheckInTime'	=> $checkintime, 
+									'IsInside'		=> 1, 
+									'VisitormstId'	=> $visitorid, 
+									'StatusVisit'	=> 'N', //N -> Undangan belum ada kunjungan, Y -> Undangan sudah ada kunjungan 
+									'SourceCompany'	=> $company, 
+									'SourcetypemstId'=> $companytype, 
+									'HostName'		=> $hostname, 
+									'TargettypemstId'=> $hostdepartment, 
+									'PurposemstId'	=> $purpose, 
+									'PVDescription'	=> $notes, 
+									'TempBody'		=> '0.00', 
+									'IsInv'			=> 0, 
+									'QRCode'		=> $dataqr,
+									'FileCI'		=> $fileName
+								);
+			$this->db->insert('visitortrans', $datavisitortrans);			
+
+			$this->db->trans_complete(); //--END TRANSAKSI
+			//---eo SIMPPAN DATA...-------------------
+			echo json_encode(['status' => 'success', 'message' => 'Data Saved!', 'qrcode' => $dataqr]);
+		} else {
+			echo json_encode(['status' => 'failed', 'message' => 'Error on data process']);
 		}
 
 	}

@@ -6,29 +6,11 @@
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <link href=<?= base_url('assets/css/select2-theme.css'); ?>" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-  <!-- jQuery Validation -->
-  <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
-  <!-- SweetAlert2 -->
-  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <!------ Include the above in your HEAD tag ---------->
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css">
-<style>
-    .register-box {
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      width: 400px;
-      box-shadow: 0 5px 10px rgba(0,0,0,0.1);
-    }
-    label.error {
-      color: red;
-      font-size: 0.8em;
-      margin-top: 5px;
-	  font-weight: normal;
-    }
-  </style>
+
 
 <div class="container">
 <br>  <p class="text-center"><a href="https://id.pli-petronas.com">PETRONAS</a> Lubricants International (PLI) | Global</p>
@@ -43,7 +25,7 @@
 	<h4 class="card-title mt-2">Registration</h4>
 </header>
 <article class="card-body">
-<form id="registerForm">
+<form method="POST" action="<?= base_url('frontmenu/checkin');?>">
 <input type="hidden" id="visitorid" name="visitorid" value="N">
 <input type="hidden" id="newphonenumber" name="newphonenumber" value="1">
 
@@ -83,8 +65,7 @@
 			<label class="form-check form-check-inline">
 				<input class="form-check-input" type="radio" id="female" name="gender" value="F">
 				<span class="form-check-label"> Female</span>
-			</label><br>
-			<label for="gender" class="error"></label>
+			</label>
 		</div> 
 	</div> 
 
@@ -100,7 +81,7 @@
 		</div> 
 		<div class="form-group col-md-6">
 		  <label>Country</label>
-		  <select id="negara" name="negara" class="selectform form-control select2-multiple">
+		  <select id="negara" name="negara" class="form-control select2-multiple">
 		  	<option value=""></option>
 		  	<option value="ID">Indonesia</option>
 			<option value="MY">Malaysia</option>
@@ -115,7 +96,6 @@
 			<option value="AE">United Arab Emirates</option>
 			<option value="GB">England</option>
 		  </select>
-		  <label for="negara" class="error"></label>
 		</div> 
 	</div> 
 
@@ -123,12 +103,11 @@
 <div class="form-row">
 	<div class="col form-group col-md-6">
 		<label>Company Name</label>   
-		<input type="text" id="company" name="company" placeholder="" class="form-control">		
+		<input type="text" id="company" name="company" placeholder="" class="form-control">
 	</div> 
 	<div class="form-group col-md-6">
 		<label>Company Type</label>
-		<?=form_dropdownDB_init('companytype', $companytypedata, 'Id', 'SourceTypeName', '','','', "id='companytype' class='selectform form-control'");?>	
-		<label for="companytype" class="error"></label>
+		<?=form_dropdownDB_init('companytype', $companytypedata, 'Id', 'SourceTypeName', '','','', "id='companytype' class='form-control'");?>	
 	</div> 
 </div> 
 
@@ -139,16 +118,14 @@
 	</div> 
 	<div class="form-group col-md-6">
 		<label>Department</label>
-		<?=form_dropdownDB_init('hostdepartment', $hostdepartmentdata, 'Id', 'TargetVisitorType', '','','', "id='hostdepartment' class='selectform form-control'");?>	
-		<label for="hostdepartment" class="error"></label>
+		<?=form_dropdownDB_init('hostdepartment', $hostdepartmentdata, 'Id', 'TargetVisitorType', '','','', "id='hostdepartment' class='form-control'");?>	
 	</div> 
 </div>
 
 <div class="form-row">
 	<div class="form-group col-md-6">
 		<label>Purpose Visit</label>
-		<?=form_dropdownDB_init('purpose', $purposedata, 'Id', 'PurposeVisit', '', '','',"id='purpose' class='selectform form-control'");?>	
-		<label for="purpose" class="error"></label>
+		<?=form_dropdownDB_init('purpose', $purposedata, 'Id', 'PurposeVisit', '', '','',"id='purpose' class='form-control'");?>	
 	</div> 
 </div> 
 <!-- ========================================= -->
@@ -159,7 +136,7 @@
 	</div> 
 
     <div class="form-group">
-		<button type="submit" class="btn btn-primary btn-block">CHECK IN</button>
+        <input type="submit" name="submit" value="CHECK IN" class="btn btn-primary btn-block">
     </div>
 </form>
 </article> 
@@ -199,142 +176,82 @@
     }
 
 	$(".allownumericwithoutdecimal").on("keypress keyup blur",function (event) {    
-		$(this).val($(this).val().replace(/[^\d].+/, ""));
-		if ((event.which < 48 || event.which > 57)) {
-			event.preventDefault();
-		}
-	});
-		
+           $(this).val($(this).val().replace(/[^\d].+/, ""));
+            if ((event.which < 48 || event.which > 57)) {
+                event.preventDefault();
+            }
+        });
+
 	$(document).ready(function() {
-		$('#registerForm').validate({
-			rules: {
-				notelepon: "required",
-				fullname:  "required",
-				idcardno: {
-					required: true,
-					minlength: 2
-				},
-				gender:  "required",
-				email:  "required",
-				address: {
-					required: true,
-					minlength: 3
-				},
-				negara:  "required",
-				company:  "required",
-				companytype:  "required",
-				hostname:  "required",
-				hostdepartment:  "required",
-				purpose:  "required"
-			},
-			messages: {				
-				notelepon: "Phone Number must not be blank",
-				fullname: "Fullname must not be blank",
-				idcardno: {
-					required: "ID Card number must not be blank",
-					minlength: "Minimum 2 chars"
-				},
-				gender:  "Gender must be selected",
-				email: "Email must not be blank",
-				address: {
-					required: "Address must not be blank",
-					minlength:  "Minimum 2 chars"
-				},
-				negara: "Country must be selected",
-				company: "Company must not be blank",
-				companytype:  "Company Type must be selected",
-				hostname:  "Hostname must not be blank",
-				hostdepartment:  "Department must be selected",
-				purpose:  "Purpose must be selected"
-			},
-			submitHandler: function (form) {
+			// let notelepon = [ "",
+				// <?php 
+				// 	$i = 0;
+				// 	for ($x = 0; $x < count($notelpdata); $x++) {
+				// 		$notelp	= $notelpdata[$x]['PhoneNumber'];
+				// 		if($x>0) {
+				// 			echo ',';
+				// 		}
+				// 		echo '"'.$notelp.'"';
+				// 		if($i==10) {
+				// 			$i=0;
+				// 			echo "\n";
+				// 		}
+				// 		$i++;
+				// 	}
+				// ?>				
+			// ];
+
+            $("#notelepon").focus();
+
+			$('#notelepon').on("blur", function(e) { 
+				var nomortelp = $(this).val();                
 				$.ajax({
-				url: '<?= base_url("frontmenu/checkin");?>',
-				type: 'POST',
-				data: $(form).serialize(),
-					success: function (response) {
-						let res = JSON.parse(response);
-						if (res.status === 'success') {
-							Swal.fire({
-								icon: "success",
-								title: "Success!",
-								text: res.message,
-								showConfirmButton: true,
-								confirmButtonText: "Print QR",
-								showCancelButton: true,
-								cancelButtonText: "Don't Print"
-							}).then((result) => {
-								if (result.isConfirmed) {
-									<?php $backurl	= base_url('frontmenu/printQR/?qrcode='); ?>
-									var uriencode = encodeURI(res.qrcode);
-									window.location.href = '<?=$backurl?>'+uriencode;
-								}
-							});
-							form.reset();
-							$(".selectform").val("").change();
+					url: '<?= base_url("frontmenu/getVisitorDetail");?>', 
+					method: 'POST',
+					data: { notelp: nomortelp },
+					dataType: 'json',
+					success: function(data) {
+						var Gender = data.Gender;
+						if(Gender == 'M') {
+							$( "#male" ).prop( "checked", true );
+							$( "#female" ).prop( "checked", false );
+						} else if (Gender == 'F') {
+							$( "#male" ).prop( "checked", false );
+							$( "#female" ).prop( "checked", true );
 						} else {
-							Swal.fire('FAILED!', res.message, 'error');
+							$( "#male" ).prop( "checked", false );
+							$( "#female" ).prop( "checked", false );
 						}
-					},
-					error: function () {
-						Swal.fire('Error!', 'Fail on connection to server', 'error');
-					}
+						$('#newphonenumber').val(data.isNew);
+						$('#fullname').val(data.Nama);						
+						$('#email').val(data.Email);
+						$('#address').val(data.Alamat);
+						$('#idcardno').val(data.IDCard);
+						$('#visitorid').val(data.Id);
+						$('#negara').val(data.Negara).change();
+					}				
 				});
-				return false;
-			}
-		});
-
-		$("#notelepon").focus();
-
-		$('#notelepon').on("blur", function(e) { 
-			var nomortelp = $(this).val();                
-			$.ajax({
-				url: '<?= base_url("frontmenu/getVisitorDetail");?>', 
-				method: 'POST',
-				data: { notelp: nomortelp },
-				dataType: 'json',
-				success: function(data) {
-					var Gender = data.Gender;
-					if(Gender == 'M') {
-						$( "#male" ).prop( "checked", true );
-						$( "#female" ).prop( "checked", false );
-					} else if (Gender == 'F') {
-						$( "#male" ).prop( "checked", false );
-						$( "#female" ).prop( "checked", true );
-					} else {
-						$( "#male" ).prop( "checked", false );
-						$( "#female" ).prop( "checked", false );
-					}
-					$('#newphonenumber').val(data.isNew);
-					$('#fullname').val(data.Nama);						
-					$('#email').val(data.Email);
-					$('#address').val(data.Alamat);
-					$('#idcardno').val(data.IDCard);
-					$('#visitorid').val(data.Id);
-					$('#negara').val(data.Negara).change();
-				}				
 			});
-		});
 
-		$('#negara').select2({
-			placeholder: "Choose Country",
-			allowClear: true
-		});
+			$('#negara').select2({
+                placeholder: "Choose Country",
+                allowClear: true
+            });
 
-		$('#hostdepartment').select2({
-			placeholder: "Choose Host Department",
-			allowClear: true
-		});
+			$('#hostdepartment').select2({
+                placeholder: "Choose Host Department",
+                allowClear: true
+            });
 
-		$('#companytype').select2({
-			placeholder: "Choose Company Type",
-			allowClear: true
-		});
+			$('#companytype').select2({
+                placeholder: "Choose Company Type",
+                allowClear: true
+            });
 
-		$('#purpose').select2({
-			placeholder: "Choose Purpose",
-			allowClear: true
-		});
+			$('#purpose').select2({
+                placeholder: "Choose Purpose",
+                allowClear: true
+            });
 	});
 </script>
 <br /><br />
