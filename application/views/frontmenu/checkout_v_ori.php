@@ -4,8 +4,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/webcamjs/1.0.25/webcam.min.js"></script>
 <link href=<?= base_url('assets/css/select2-theme.css'); ?>" rel="stylesheet" />
-<!-- SweetAlert2 -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <!------ Include the above in your HEAD tag ---------->
 
@@ -25,7 +23,7 @@
 	<h4 class="card-title mt-2">Visitor's Data</h4>
 </header>
 <article class="card-body">
-<form id="checkoutForm" novalidate>
+<form method="POST" action="<?= base_url('frontmenu/checkout');?>">
 <input type="hidden" id="idvistrans" name="idvistrans" value="<?=$idvistrans?>">
 <input type="hidden" id="notelepon" name="notelepon" value="<?=$phone?>">
 	<div class="form-row">
@@ -40,7 +38,7 @@
 		</div> 
 		<div class="col-md-6">
 			<div id="my_camera"></div>			
-			<input type="hidden" name="image" id="image" class="image-tag">
+			<input type="hidden" name="image" class="image-tag">
 		</div> 
 	</div> 	
 	<br />
@@ -61,7 +59,7 @@
 	</div> 
 
     <div class="form-group">
-		<button type="submit" class="btn btn-primary btn-block">CHECK OUT</button>
+        <input type="submit" name="submit" value="CHECK OUT" id="checkout" class="btn btn-primary btn-block">
     </div>
 </form>
 </article> 
@@ -101,44 +99,8 @@
     }
 
 	$(document).ready(function() {
-		$("#checkout").focus();
-		
-		$('#checkoutForm').on('submit', function (e) {
-			e.preventDefault();
-			var idvistrans = $("#idvistrans").val();
-			var notelepon = $("#notelepon").val();
-			var image = $("#image").val();
-			$.ajax({
-				url: '<?= base_url("frontmenu/checkout");?>',
-				type: 'POST',
-				data: { 
-					idvistrans: idvistrans, 
-					notelepon: notelepon,
-					image: image
-				},
-				success: function (response) {
-					let res = JSON.parse(response);
-					if (res.status === 'success') {
-						Swal.fire({
-							icon: "success",
-							title: "Checked Out!",
-							text: res.message
-						}).then((result) => {
-							if (result.isConfirmed) {
-								<?php $backurl	= base_url('frontmenu'); ?>
-								window.location.href = '<?=$backurl?>';
-							}
-						});
-						form.reset();
-					} else {
-						Swal.fire('FAILED!', res.message, 'error');
-					}
-				},
-				error: function () {
-					Swal.fire('Error!', 'Fail on connection to server', 'error');
-				}
-			});		
-		});
+            $("#checkout").focus();
+			
 	});
 </script>
 <br /><br />

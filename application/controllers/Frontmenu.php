@@ -203,6 +203,46 @@ class Frontmenu extends CI_Controller
 
 	public function checkout()
 	{
+		$idvistrans	= $this->input->post('idvistrans');
+		$notelepon	= $this->input->post('notelepon');
+		$img		= $this->input->post('image');
+
+		$checkouttime			= date("Y-m-d H:i:s");
+		$now					= date("Ymd_His");
+		if(!is_null($idvistrans)) {	
+			//--- SIMPAN FILE GAMBAR di FOLDER			
+			$folderPath		= FCPATH."assets/uploads/checkout/";	
+			$image_parts	= explode(";base64,", $img);
+			if(isset($image_parts[1])) {
+				$image_base64	= base64_decode($image_parts[1]);			
+				$fileName		= 'CO'.$now.'_'.$notelepon.'.png';	
+				$file			= $folderPath . $fileName;
+				file_put_contents($file, $image_base64);
+			} else {
+				$fileName		= '';
+			}
+			//-- eo SIMPAN FILE GAMBAR...
+
+			$this->db->trans_start(); //-START TRANSAKSI 
+
+			$datavisitortrans	= array(
+				'CheckOutTime'	=> $checkouttime, 
+				'IsInside'		=> 0, 			
+				'FileCO'		=> $fileName
+			);
+			$this->db->update('visitortrans', $datavisitortrans, array('Id'	=> $idvistrans));
+
+			$this->db->trans_complete(); //--END TRANSAKSI
+
+			echo json_encode(['status' => 'success', 'message' => 'Checked Out!']);
+		} else {
+			echo json_encode(['status' => 'failed', 'message' => 'Error on data process']);
+		}
+
+	}
+
+	public function checkout_ori()
+	{
 		$submit		= $this->input->post('submit');
 		$idvistrans	= $this->input->post('idvistrans');
 		$notelepon	= $this->input->post('notelepon');
