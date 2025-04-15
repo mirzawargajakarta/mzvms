@@ -13,15 +13,12 @@ class Visiting extends CI_Controller
     public function index()
     {
         
-		$data['title'] = 'Visit';
-		// $on = 'tabel_profil.id_profil = tabel_user.id_profil';
-		// $data['user'] = $this->Default_m->getAllTwoTable('tabel_user', 'tabel_profil', $on, 'id_user')->result();
-		// $data['num'] = $this->Default_m->getAll('tabel_user', 'id_user')->num_rows();
-		$data['data'] = $this->_getDataIndex();
-		$data['num'] = count($this->_getDataIndex());
+		$data['title'] = 'File';
 
 		$this->load->view('templates/header', $data);
-		$this->load->view('visiting/index_client', $data);
+		$this->load->view('templates/jqueryadminlte_js', $data);
+		$this->load->view('templates/datatables_js', $data);
+		$this->load->view('visiting/index_server', $data);
 		$this->load->view('templates/foot', $data);
     }
 
@@ -40,6 +37,78 @@ class Visiting extends CI_Controller
 	}
 
 	public function serverside_datatables()
+	{
+		$columns = array( 
+			0	=> 'd.Id', 
+			1	=> 'd.HostName',
+			2	=> 'd.SourceCompany',
+			3	=> 'd.IsInside',
+			4	=> 't.TargetVisitorType',
+			5	=> 'p.PurposeVisit',
+			6   => 'v.Nama',
+			7	=> 'v.PhoneNumber',
+			8	=> 's.SourceTypeName'
+		);
+
+		$draw	= $_POST['draw']; // digunakan oleh DataTables untuk memastikan bahwa Ajax kembali dari permintaan pemrosesan sisi server. biasanya menggunakan nilai int, seperti 1 yang artinya mengembalikan permintaan
+		$limit	= $_POST['length']; // jumlah baris yang ditampilkan.
+		$start	= $_POST['start']; // index untuk awal data, baris pertama dimulai dari index 0.
+		$order	= $columns[$_POST['order']['0']['column']]; // pengurutan berdasarkan kolom yang dipilih.
+		$dir 	= $_POST['order']['0']['dir']; // pengurutan secara ascending atau descending.
+		$search	= $_POST['search']['value']; // data pencarian.		
+		
+		$query	= "SELECT 
+					d.Id, d.HostName, d.SourceCompany, d.IsInside, t.TargetVisitorType, p.PurposeVisit,
+					v.Nama, v.PhoneNumber, s.SourceTypeName
+				FROM visitortrans d, visitormst v, targettypemst t, purposemst p, sourcetypemst s
+				WHERE d.VisitormstId=v.Id AND d.TargettypemstId=t.Id 
+					AND d.PurposemstId=p.Id AND d.SourcetypemstId=s.Id ";
+
+		$totalData	= $this->db->query($query)->num_rows();
+		$totalFiltered	= $totalData;
+
+		if($search != '') {
+			$query	.= "AND (v.PhoneNumber LIKE '%$search%' OR d.HostName LIKE '%$search%' OR d.SourceCompany LIKE '%$search%') ";
+			$totalFiltered = $this->db->query($query)->num_rows();
+		}
+		$query .= "ORDER BY $order $dir LIMIT $limit OFFSET $start";
+
+		$user_arr	= $this->db->query($query)->result_array();
+		
+		$datatables = array();
+        if(!empty($user_arr))
+        {
+			$no = 0;
+            foreach($user_arr as $user) :
+				$no++;
+				$action		= "<a href='".base_url()."visiting/detail/".$user['Id']."' class='btn btn-secondary'>Detail</a>";
+				$isinside	= ($user['IsInside']>0)?'Yes':'No';
+
+                $nestedData['No']					= $no;
+                $nestedData['HostName']				= $user['HostName'];
+                $nestedData['SourceCompany']		= $user['SourceCompany'];
+				$nestedData['TargetVisitorType']	= "<p align='center'>".$user['TargetVisitorType']."</p>";
+				$nestedData['PurposeVisit']			= $user['PurposeVisit'];
+				$nestedData['Nama']					= $user['Nama'];
+				$nestedData['PhoneNumber']			= $user['PhoneNumber'];
+				$nestedData['SourceTypeName']		= $user['SourceTypeName'];
+				$nestedData['IsInside']				= $isinside;
+				$nestedData['Action']				= $action;
+
+				$datatables[] = $nestedData;
+			endforeach;
+        }
+
+		$json_data = array(
+						"draw"            => intval($draw),  
+						"recordsTotal"    => intval($totalData),  
+						"recordsFiltered" => intval($totalFiltered), 
+						"data"            => $datatables,
+					);	 
+		echo json_encode($json_data); 
+	}
+
+	public function serverside_datatables_ori()
 	{
 		$columns = array( 
 			0	=> 'u.id', 

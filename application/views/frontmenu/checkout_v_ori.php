@@ -11,7 +11,7 @@
 
 
 <div class="container">
-<br>  <p class="text-center"><a href="https://id.pli-petronas.com">PETRONAS</a> Lubricants International (PLI) | Global</p>
+<br>  <p class="text-center"><a href="https://www.petronas.com/">Petronas</a> Carigali Ketapang II Ltd (PCK2L)</p>
 <hr>
 
 
