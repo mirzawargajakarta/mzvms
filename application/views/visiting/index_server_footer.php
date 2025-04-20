@@ -57,6 +57,7 @@
 	<!-- /.content -->
 </div>
 
+<?php $this->load->view('templates/footer.php'); ?>
 
 <script type="text/javascript">
 $(document).ready(function() {
@@ -89,6 +90,28 @@ $(document).ready(function() {
 	$('#vistable').on('click', '.get-detail', function() {
 		const id = $(this).data('id');
 		$(".detailUser").load("<?=base_url('visiting/detail/')?>" + id);
-	});
+	});	
+
+	$('#vistable').on('click', '.to-delete', function(e) {
+		e.preventDefault();
+		const id = $(this).data('id');
+		Swal.fire({
+			title: 'Are you sure !',
+			text: "Data with #id="+id+" will be delete",
+			type: 'warning',
+			showCancelButton: true,
+			confirmButtonColor: '#3085d6',
+			cancelButtonColor: '#d33',
+			confirmButtonText: 'Delete'
+		}).then((result) => {
+			if (result.isConfirmed) {
+				const encoded = encodeURI(id);
+				document.location.href = '<?=base_url("visiting/hapus/?mzvms=");?>'+encoded;
+			}
+		})
+
+		});
+
 });
+
 </script>

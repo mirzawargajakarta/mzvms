@@ -39,7 +39,8 @@
 <!-- AdminLTE for demo purposes -->
 <script src="<?= base_url('assets/vendor/dist/js/demo.js') ?>"></script>
 <!-- SweetAlert2 -->
-<script src="<?= base_url('assets/vendor/sweet-alert-2/sweetalert2.all.min.js'); ?>"></script>
+{% comment %} <script src="<?= base_url('assets/vendor/sweet-alert-2/sweetalert2.all.min.js'); ?>"></script> {% endcomment %}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!-- chart js -->
 <script src="<?= base_url('assets/vendor/chartjs/chart.js'); ?>"></script>
 <script src="<?= base_url('assets/vendor/chartjs/utils.js'); ?>"></script>

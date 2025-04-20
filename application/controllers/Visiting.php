@@ -13,13 +13,18 @@ class Visiting extends CI_Controller
     public function index()
     {
         
-		$data['title'] = 'File';
+		$data['title'] = 'Visitment';
+
+		// $this->load->view('templates/header', $data);
+		// $this->load->view('templates/jqueryadminlte_js', $data);
+		// $this->load->view('templates/datatables_js', $data);
+		// $this->load->view('visiting/index_server', $data);
+		// $this->load->view('templates/foot', $data);
 
 		$this->load->view('templates/header', $data);
-		$this->load->view('templates/jqueryadminlte_js', $data);
-		$this->load->view('templates/datatables_js', $data);
-		$this->load->view('visiting/index_server', $data);
+		$this->load->view('visiting/index_server_footer', $data);
 		$this->load->view('templates/foot', $data);
+		
     }
 
 	function _getDataIndex()
@@ -39,15 +44,15 @@ class Visiting extends CI_Controller
 	public function serverside_datatables()
 	{
 		$columns = array( 
-			0	=> 'd.Id', 
-			1	=> 'd.HostName',
-			2	=> 'd.SourceCompany',
-			3	=> 'd.IsInside',
-			4	=> 't.TargetVisitorType',
-			5	=> 'p.PurposeVisit',
-			6   => 'v.Nama',
-			7	=> 'v.PhoneNumber',
-			8	=> 's.SourceTypeName'
+			0	=> 't.Id', 
+			1	=> 't.HostName',
+			2	=> 'r.TargetVisitorType',
+			3	=> 'v.Nama',
+			4	=> 't.SourceCompany',
+			5	=> 's.SourceTypeName',
+			6   => 'v.PhoneNumber',
+			7	=> 'p.PurposeVisit',
+			8	=> 't.IsInv'
 		);
 
 		$draw	= $_POST['draw']; // digunakan oleh DataTables untuk memastikan bahwa Ajax kembali dari permintaan pemrosesan sisi server. biasanya menggunakan nilai int, seperti 1 yang artinya mengembalikan permintaan
@@ -56,43 +61,61 @@ class Visiting extends CI_Controller
 		$order	= $columns[$_POST['order']['0']['column']]; // pengurutan berdasarkan kolom yang dipilih.
 		$dir 	= $_POST['order']['0']['dir']; // pengurutan secara ascending atau descending.
 		$search	= $_POST['search']['value']; // data pencarian.		
-		
+
 		$query	= "SELECT 
-					d.Id, d.HostName, d.SourceCompany, d.IsInside, t.TargetVisitorType, p.PurposeVisit,
-					v.Nama, v.PhoneNumber, s.SourceTypeName
-				FROM visitortrans d, visitormst v, targettypemst t, purposemst p, sourcetypemst s
-				WHERE d.VisitormstId=v.Id AND d.TargettypemstId=t.Id 
-					AND d.PurposemstId=p.Id AND d.SourcetypemstId=s.Id ";
+						t.Id, t.CheckInTime, t.CheckOutTime, t.IsInside, t.VisitormstId, 
+					t.SourceCompany, t.SourcetypemstId, t.HostName, t.TargettypemstId, 
+					t.PurposemstId, t.PVDescription, t.TempBody, t.AppointmentDate, 
+					t.StatusVisit, t.IsInv, t.QRCode, t.FileCI, t.FileCO, t.InvBy,
+					v.Nama, v.Gender, v.PhoneNumber, v.Email, 
+					v.Alamat, v.IDCard, v.FileIDCard,
+					p.PurposeVisit, s.SourceTypeName, r.TargetVisitorType
+				FROM 
+					visitortrans t, visitormst v, purposemst p, sourcetypemst s,
+					targettypemst r
+				WHERE t.VisitormstId=v.Id AND t.TargettypemstId=r.Id 
+					AND t.PurposemstId=p.Id AND t.SourcetypemstId=s.Id ";
 
 		$totalData	= $this->db->query($query)->num_rows();
 		$totalFiltered	= $totalData;
 
 		if($search != '') {
-			$query	.= "AND (v.PhoneNumber LIKE '%$search%' OR d.HostName LIKE '%$search%' OR d.SourceCompany LIKE '%$search%') ";
+			$query	.= "AND (v.PhoneNumber LIKE '%$search%' OR t.HostName LIKE '%$search%' OR t.SourceCompany LIKE '%$search%') ";
 			$totalFiltered = $this->db->query($query)->num_rows();
 		}
 		$query .= "ORDER BY $order $dir LIMIT $limit OFFSET $start";
 
-		$user_arr	= $this->db->query($query)->result_array();
+		$data_arr	= $this->db->query($query)->result_array();
 		
 		$datatables = array();
-        if(!empty($user_arr))
+        if(!empty($data_arr))
         {
 			$no = 0;
-            foreach($user_arr as $user) :
+            foreach($data_arr as $data) :
 				$no++;
-				$action		= "<a href='".base_url()."visiting/detail/".$user['Id']."' class='btn btn-secondary'>Detail</a>";
-				$isinside	= ($user['IsInside']>0)?'Yes':'No';
 
-                $nestedData['No']					= $no;
-                $nestedData['HostName']				= $user['HostName'];
-                $nestedData['SourceCompany']		= $user['SourceCompany'];
-				$nestedData['TargetVisitorType']	= "<p align='center'>".$user['TargetVisitorType']."</p>";
-				$nestedData['PurposeVisit']			= $user['PurposeVisit'];
-				$nestedData['Nama']					= $user['Nama'];
-				$nestedData['PhoneNumber']			= $user['PhoneNumber'];
-				$nestedData['SourceTypeName']		= $user['SourceTypeName'];
-				$nestedData['IsInside']				= $isinside;
+				$action	= 
+				   "<a href='#' class='get-detail btn btn-outline-info' data-id='".$data['Id']."' data-toggle='modal' data-target='#get-detail'>
+						<i class='fas fa-eye pop' data-toggle='popover' data-placement='bottom' data-content='Detail'> </i>
+					</a>
+					<a href='".base_url('visiting/edit/'. $data['Id'])."' class='btn btn-outline-warning'>
+						<i class='fas fa-edit pop' data-toggle='popover' data-placement='bottom' data-content='EDIT'></i>
+					</a>
+					<a href='#' data-id='".$data['Id']."' class='to-delete btn btn-outline-danger'>
+						<i class='fas fa-trash-alt pop' data-toggle='popover' data-placement='bottom' data-content='Delete'></i>
+					</a>";	
+				
+				$invitation= ($data['IsInv']>0)?$data['InvBy']:'No';
+
+                $nestedData['No']					= "<p align='right'>".$data['Id']."&nbsp;</p>";
+                $nestedData['HostName']				= $data['HostName'];
+                $nestedData['SourceCompany']		= $data['SourceCompany'];
+				$nestedData['TargetVisitorType']	= "<p align='center'>".$data['TargetVisitorType']."</p>";
+				$nestedData['PurposeVisit']			= $data['PurposeVisit'];
+				$nestedData['Nama']					= $data['Nama'];
+				$nestedData['PhoneNumber']			= $data['PhoneNumber'];
+				$nestedData['SourceTypeName']		= $data['SourceTypeName'];
+				$nestedData['Invitation']			=  "<p align='center'>".$invitation."</p>";
 				$nestedData['Action']				= $action;
 
 				$datatables[] = $nestedData;
@@ -108,66 +131,34 @@ class Visiting extends CI_Controller
 		echo json_encode($json_data); 
 	}
 
-	public function serverside_datatables_ori()
+	public function detail($id)
 	{
-		$columns = array( 
-			0	=> 'u.id', 
-			1	=> 'u.username',
-			2	=> 'u.email',
-			3	=> 'ug.usergroup_name',
-			4	=> 'u.is_active',
-		);
+		$data['title']	= 'Detail=>'.$id;
+		$data['data']	= $this->_getVisitorTransDetail($id);
+		$this->load->view('visiting/detail_v', $data);
+	}
 
-		$draw	= $_POST['draw']; // digunakan oleh DataTables untuk memastikan bahwa Ajax kembali dari permintaan pemrosesan sisi server. biasanya menggunakan nilai int, seperti 1 yang artinya mengembalikan permintaan
-		$limit	= $_POST['length']; // jumlah baris yang ditampilkan.
-		$start	= $_POST['start']; // index untuk awal data, baris pertama dimulai dari index 0.
-		$order	= $columns[$_POST['order']['0']['column']]; // pengurutan berdasarkan kolom yang dipilih.
-		$dir 	= $_POST['order']['0']['dir']; // pengurutan secara ascending atau descending.
-		$search	= $_POST['search']['value']; // data pencarian.		
-		
-		$query	= "SELECT 
-					u.id, u.username, u.email, ug.usergroup_name, u.is_active 
-				FROM rolesuser u, rolesusergroup ug
-				WHERE u.usergroup_id=ug.id ";
-
-		$totalData	= $this->db->query($query)->num_rows();
-		$totalFiltered	= $totalData;
-
-		if($search != '') {
-			$query	.= "AND (u.username LIKE '%$search%' OR u.email LIKE '%$search%' OR ug.usergroup_name LIKE '%$search%') ";
-			$totalFiltered = $this->db->query($query)->num_rows();
-		}
-		$query .= "ORDER BY $order $dir LIMIT $limit OFFSET $start";
-
-		$user_arr	= $this->db->query($query)->result_array();
-		
-		$datatables = array();
-        if(!empty($user_arr))
-        {
-            foreach($user_arr as $user) :
-				$is_aktif_badge = ($user['is_active']>0)?'badge-success':'badge-danger';
-				$activestring	= ($user['is_active']>0)?'Aktif':'Suspend';
-				$active			= '<div class="badge '.$is_aktif_badge.'">'.$activestring.'</div>';
-				$action			= "<a href='".base_url()."user/detail/".$user['id']."' class='btn btn-secondary'>Detail</a>";
-
-                $nestedData['id']				= $user['id'];
-                $nestedData['username']			= $user['username'];
-                $nestedData['email']			= $user['email'];
-				$nestedData['usergroup_name']	= "<p align='center'>".$user['usergroup_name']."</p>";
-				$nestedData['active']			= $active;
-                $nestedData['action']			= $action;
-
-				$datatables[] = $nestedData;
-			endforeach;
-        }
-
-		$json_data = array(
-						"draw"            => intval($draw),  
-						"recordsTotal"    => intval($totalData),  
-						"recordsFiltered" => intval($totalFiltered), 
-						"data"            => $datatables,
-					);	 
-		echo json_encode($json_data); 
+	function _getVisitorTransDetail($idvistrans)
+	{
+		$sql = "SELECT 	
+				t.Id, t.CheckInTime, t.CheckOutTime, t.IsInside, t.VisitormstId, 
+				DATE_FORMAT(t.CheckInTime,'%e %b %Y %l:%i %p') AS CheckInTimeIndFmt,
+				DATE_FORMAT(t.CheckOutTime,'%e %b %Y %l:%i %p') AS CheckOutTimeIndFmt,
+				t.SourceCompany, t.SourcetypemstId, t.HostName, t.TargettypemstId, 
+				t.PurposemstId, t.PVDescription, t.TempBody, t.AppointmentDate, 
+				t.StatusVisit, t.IsInv, t.QRCode, t.FileCI, t.FileCO,
+				v.Nama, v.Gender, v.PhoneNumber, v.Email, 
+				v.Alamat, v.IDCard, v.FileIDCard,
+				p.PurposeVisit, s.SourceTypeName, r.TargetVisitorType
+			FROM 
+				visitortrans t, visitormst v, purposemst p, sourcetypemst s,
+				targettypemst r
+			WHERE 
+				t.VisitormstId=v.Id AND t.SourcetypemstId=s.Id AND t.PurposemstId=p.Id 
+				AND t.TargettypemstId=r.Id AND t.Id='$idvistrans'";
+		$query = $this->db->query($sql);
+		$result = $query->result_array();
+		return $result[0];
 	}
 
     public function form($id_user = null)
@@ -243,15 +234,17 @@ class Visiting extends CI_Controller
         }
     }
 
-    public function hapus($id_user)
+    public function hapus()
     {
-        $where = ['id_user' => $id_user];
-        $user = $this->Default_m->getWhere('tabel_user', $where)->row();
-        unlink('./assets/img/' . $user->foto);
-        $this->Default_m->delete('tabel_user', $where);
+		$encode	= $this->input->get('mzvms');
+		$id	= urldecode($encode);
+        $where = ['Id' => $id];
+        $vms = $this->Default_m->getWhere('visitortrans', $where)->row();
+        unlink(FCPATH.'assets/uploads/checkin/' . $vms->FileCI);
+		unlink(FCPATH.'assets/uploads/checkout/' . $vms->FileCO);
+        $this->Default_m->delete('visitortrans', $where);
         if ($this->db->affected_rows() > 0) {
-            $this->session->set_flashdata('flash', 'Data Berhasil Dihapus');
-            redirect('user');
+            redirect('visiting');
         }
     }
 
