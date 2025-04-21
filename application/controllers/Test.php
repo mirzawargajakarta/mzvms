@@ -50,10 +50,6 @@ class Test extends CI_Controller
         $config = [
             'protocol'  => 'smtp',
             'smtp_host' => 'smtp.googlemail.com',
-            // 'smtp_user' => 'infosjengat@sarana-jaya.co.id',
-            // 'smtp_pass' => 'Sj1982#2024@01',
-						'smtp_user' => 'mirzawargajakarta@gmail.com',
-            'smtp_pass' => 'jinobu15',
             'smtp_port' => 465,
             'smtp_crypto' => 'ssl',
             'mailtype'  => 'html',
