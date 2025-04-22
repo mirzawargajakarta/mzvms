@@ -11,15 +11,8 @@ class Visiting extends CI_Controller
     }
 
     public function index()
-    {
-        
+    {        
 		$data['title'] = 'Visitment';
-
-		// $this->load->view('templates/header', $data);
-		// $this->load->view('templates/jqueryadminlte_js', $data);
-		// $this->load->view('templates/datatables_js', $data);
-		// $this->load->view('visiting/index_server', $data);
-		// $this->load->view('templates/foot', $data);
 
 		$this->load->view('templates/header', $data);
 		$this->load->view('visiting/index_server_footer', $data);
@@ -136,6 +129,15 @@ class Visiting extends CI_Controller
 		$data['title']	= 'Detail=>'.$id;
 		$data['data']	= $this->_getVisitorTransDetail($id);
 		$this->load->view('visiting/detail_v', $data);
+	}
+
+	public function edit($id)
+	{
+		$data['title'] = 'Visitment Data Edit';
+		$data['data']	= $this->_getVisitorTransDetail($id);
+		$this->load->view('templates/header', $data);
+		$this->load->view('visiting/edit_v', $data);
+		$this->load->view('templates/foot', $data);
 	}
 
 	function _getVisitorTransDetail($idvistrans)

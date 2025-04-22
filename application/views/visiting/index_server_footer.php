@@ -57,7 +57,7 @@
 	<!-- /.content -->
 </div>
 
-<?php $this->load->view('templates/footer.php'); ?>
+<?php $this->load->view('templates/footer_two.php'); ?>
 
 <script type="text/javascript">
 $(document).ready(function() {

@@ -11,7 +11,7 @@ class Frontmenu extends CI_Controller
     public function index()
     {
 		$data['title'] = "MzVMS";
-		$this->load->view('frontmenu/index', $data);
+		$this->load->view('frontmenu/index_two', $data);
     }
 
 	public function registration()
