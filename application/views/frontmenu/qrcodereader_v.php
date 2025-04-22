@@ -5,10 +5,16 @@
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <link href=<?= base_url('assets/css/select2-theme.css'); ?>" rel="stylesheet" />
+<style>
+	body {
+			background-image: url("<?= base_url('assets/img/background.png')?>");
+			background-repeat: no-repeat;
+			background-attachment: fixed;
+			background-size: 100% 100%;
+		}
+</style>
 		<title><?php echo $title;?></title>
 </head>
-
-
 
 <body>
 	<br />
@@ -36,10 +42,6 @@
 	</div>
 </div>
 </body>
-
-
-
-
 
 <script src="https://unpkg.com/html5-qrcode"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>

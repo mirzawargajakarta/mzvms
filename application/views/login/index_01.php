@@ -25,15 +25,17 @@
 	<link href="https://fonts.googleapis.com/css2?family=Acme&display=swap" rel="stylesheet">
 	<!-- my style -->
 	<link href="<?= base_url('assets/css/login.css'); ?>" rel="stylesheet">
+	<style>
+	body {
+			background-image: url("<?= base_url('assets/img/'.$config->background)?>");
+			background-repeat: no-repeat;
+			background-attachment: fixed;
+			background-size: 100% 100%;
+		}
+		</style>
 </head>
 
-<body style="
-background: linear-gradient(rgb(255, 255, 255),rgba(255, 255, 255)),url(<?= base_url('assets/img/' . $config->background); ?>); 
-background-repeat: no-repeat;
-background-size: cover;
-background-position: center;
-background-attachment: fixed;
-">
+<body>
 	<div class="flash-data" data-flashdata="<?= $this->session->flashdata('flash'); ?>"></div>
 	<div class="flash-error" data-flashdata="<?= $this->session->flashdata('error'); ?>"></div>
 

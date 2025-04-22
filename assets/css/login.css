@@ -24,7 +24,7 @@ html {
 .card {
 	margin-top: auto;
 	margin-bottom: auto;
-	background-color: rgba(20, 133, 240, 0.5) !important;
+	background-color: #15AAAA !important;
 }
 
 .social_icon span:hover {
@@ -44,7 +44,7 @@ html {
 
 .input-group-prepend span {
 	width: 50px;
-	background-color: #000875;
+	background-color: #094d4d;
 	color: white;
 	border: 0 !important;
 }
@@ -56,7 +56,7 @@ input:focus {
 
 .login_btn {
 	color: white;
-	background-color: #000875;
+	background-color: #094d4d;
 	width: 100px;
 }
 
