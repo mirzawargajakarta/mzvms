@@ -7,7 +7,14 @@
 <!------ Include the above in your HEAD tag ---------->
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css">
-
+<style>
+	body {
+		background-image: url("<?= base_url('assets/img/background.png')?>");
+		background-repeat: no-repeat;
+		background-attachment: fixed;
+		background-size: 100% 100%;
+	}
+</style>
 
 <div class="container">
 <br>  <p class="text-center"><a href="https://www.petronas.com/">Petronas</a> Carigali Ketapang II Ltd (PCK2L)</p>

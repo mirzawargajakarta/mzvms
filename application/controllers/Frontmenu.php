@@ -506,6 +506,20 @@ class Frontmenu extends CI_Controller
 		$this->load->view('frontmenu/printqr_v', $data);
 	}
 
+	public function _checkin()
+	{
+		$img				= $this->input->post('image');
+		$image_parts	= explode(";base64,", $img);
+		$folderPath		= FCPATH."assets/uploads/checkin/";	
+			$image_parts	= explode(";base64,", $img);
+				$image_base64	= base64_decode($image_parts[1]);			
+				$fileName		= 'testok.png';	
+				$file			= $folderPath . $fileName;
+				file_put_contents($file, $image_base64);
+		echo json_encode(['status' => 'success', 'message' => $file, 'qrcode' => 'test ok']);
+		
+	}
+
 	public function checkin()
 	{
 		$visitorid			= $this->input->post('visitorid');

@@ -254,10 +254,10 @@
 				purpose:  "Purpose must be selected"
 			},
 			submitHandler: function (form) {
-				$.ajax({
-				url: '<?= base_url("frontmenu/checkin");?>',
-				type: 'POST',
-				data: $(form).serialize(),
+					$.ajax({
+					url: '<?= base_url("frontmenu/checkin");?>',
+					type: 'POST',
+					data: $(form).serialize(),
 					success: function (response) {
 						let res = JSON.parse(response);
 						if (res.status === 'success') {
