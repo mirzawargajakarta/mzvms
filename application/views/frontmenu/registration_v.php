@@ -71,7 +71,7 @@
 	</div> 
 	<div class="form-row">
 		<div class="col form-group col-md-8">
-			<label>Full Nama </label>   
+			<label>Full Name</label>   
 		  	<input type="text" class="form-control" id="fullname" name="fullname" placeholder="">
 		</div> 
 		<div class="col form-group col-md-4">

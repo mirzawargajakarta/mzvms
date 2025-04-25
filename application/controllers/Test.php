@@ -8,7 +8,7 @@ class Test extends CI_Controller
         parent::__construct();
     }
 
-		public function index() 
+		public function index_() 
 		{
 			echo FCPATH;
 		}
@@ -36,7 +36,7 @@ class Test extends CI_Controller
 
     }
 
-		public function asd_index()
+		public function index()
     {
 				$email= "ahmad.mirza@sarana-jaya.co.id";
 				$emailcc='';
@@ -50,6 +50,8 @@ class Test extends CI_Controller
         $config = [
             'protocol'  => 'smtp',
             'smtp_host' => 'smtp.googlemail.com',
+						'smtp_user' => 'infosjengat@sarana-jaya.co.id', //'saranajayaengat@gmail.com', 'programdpnolrupiah@gmail.com'
+            'smtp_pass' => 'zmbm bgne bxmk cejy',//'Sj1982#2024@01',
             'smtp_port' => 465,
             'smtp_crypto' => 'ssl',
             'mailtype'  => 'html',

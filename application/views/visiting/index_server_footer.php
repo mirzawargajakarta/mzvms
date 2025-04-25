@@ -12,7 +12,7 @@
 
 			<div class="table-responsive">
 				<table class="table table-hover table-bordered w-100 text-nowrap" id="vistable">
-					<thead class="bg-primary text-white  text-center">
+					<thead class="bg-success text-white  text-center">
 						<tr>
 							<th scope="col">#</th>
 							<th scope="col">Host</th>
