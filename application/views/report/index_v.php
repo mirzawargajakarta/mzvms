@@ -66,7 +66,7 @@
 			<div class="col-md-6">
 				<div class="card card-primary">
 					<div class="card-header">
-						<h3 class="card-title">Pie Chart</h3>
+						<h3 class="card-title">Purpose Visit</h3>
 
 						<div class="card-tools">
 							<button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
@@ -84,7 +84,7 @@
 			<div class="col-md-6">
 				<div class="card card-success">
 					<div class="card-header">
-						<h3 class="card-title">Bar Chart</h3>
+						<h3 class="card-title">Visitor's Country</h3>
 
 						<div class="card-tools">
 							<button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
@@ -104,7 +104,7 @@
 			<div class="col-md-6">
 				<div class="card card-danger">
 					<div class="card-header">
-						<h3 class="card-title">Line Chart</h3>
+						<h3 class="card-title">Visitor's Country</h3>
 
 						<div class="card-tools">
 							<button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
@@ -122,7 +122,7 @@
 			<div class="col-md-6">
 				<div class="card card-warning">
 					<div class="card-header">
-						<h3 class="card-title">Stacked Bar Chart</h3>
+						<h3 class="card-title">Visitor's Country</h3>
 
 						<div class="card-tools">
 							<button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
@@ -151,7 +151,7 @@
       labels  : ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
       datasets: [
         {
-          label               : 'Digital Goods',
+          label               : 'Indonesia',
           backgroundColor     : 'rgba(60,141,188,0.9)',
           borderColor         : 'rgba(60,141,188,0.8)',
           pointRadius          : false,
@@ -162,7 +162,7 @@
           data                : [28, 48, 40, 19, 86, 27, 90]
         },
         {
-          label               : 'Electronics',
+          label               : 'Malaysia',
           backgroundColor     : 'rgba(210, 214, 222, 1)',
           borderColor         : 'rgba(210, 214, 222, 1)',
           pointRadius         : false,
@@ -217,12 +217,12 @@
     //-------------
 	var donutData        = {
       labels: [
-          'Chrome',
-          'IE',
-          'FireFox',
-          'Safari',
-          'Opera',
-          'Navigator',
+          'Interview',
+          'Training',
+          'Courier',
+          'Meeting',
+          'Working',
+          'Others',
       ],
       datasets: [
         {
