@@ -18,31 +18,49 @@ class Test extends CI_Controller
 			echo password_hash('asdf', PASSWORD_DEFAULT);
     }
 
-		public function __index()
-    {
-			$to ="mirzawargajakarta@gmail.com";
-			$subject = "Test pertama";
-			$msg ="Contoh body email baris pertama\nBaris Kedua";
-			$headers = "From: anon@localhost.com\r\n";
-			$headers .= "Reply-To: anon@localhost.com\r\n";
-			$headers .= "Content-Type: text/html; charset=UTF-8\r\n";
-
-			$mailsent	= mail($to, $subject, $msg, $headers);
-			if($mailsent) {
-				echo "BERHASIL !!";
-			} else {
-				echo "GAGAL!!!";
-			}
-
-    }
-
 		public function index()
     {
-				$email= "ahmad.mirza@sarana-jaya.co.id";
+			$email= "ahmad.mirza@sarana-jaya.co.id";
 				$emailcc='';
 				$msg ="<html><body><h2>TES MZVMS</h2></body></html>";
 				$this->_sendEmail($email, $emailcc, 'ok', $msg);
     }
+
+		public function __index()
+    {
+			$no='6281398081536';
+			$msg='Ini Test ke duaPake php';
+
+			$this->_sendWA($no, $msg);
+    }
+
+		function _sendWA($nohp, $msg)
+		{
+			$curl = curl_init();
+
+			curl_setopt_array($curl, array(
+				CURLOPT_URL => 'https://app.saungwa.com/api/create-message',
+				CURLOPT_RETURNTRANSFER => true,
+				CURLOPT_ENCODING => '',
+				CURLOPT_MAXREDIRS => 10,
+				CURLOPT_TIMEOUT => 0,
+				CURLOPT_FOLLOWLOCATION => true,
+				CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+				CURLOPT_CUSTOMREQUEST => 'POST',
+				CURLOPT_POSTFIELDS => array(
+					'appkey' => 'f1292ea6-5001-4a34-87e7-78dec18993df',
+					'authkey' => 'QmxImxBV4tKMSOXx3cXbklueFh1gnjLI3jANxscthSOJoqOq2S',
+					'to' => $nohp,
+					'message' => $msg,
+					'sandbox' => 'false'
+				),
+			));
+
+			$response = curl_exec($curl);
+
+			curl_close($curl);
+			echo $response;
+		}
 
 		function _sendEmail($sendto, $emailcc, $status, $msg)
     {
@@ -50,8 +68,8 @@ class Test extends CI_Controller
         $config = [
             'protocol'  => 'smtp',
             'smtp_host' => 'smtp.googlemail.com',
-						'smtp_user' => 'infosjengat@sarana-jaya.co.id', //'saranajayaengat@gmail.com', 'programdpnolrupiah@gmail.com'
-            'smtp_pass' => 'zmbm bgne bxmk cejy',//'Sj1982#2024@01',
+						'smtp_user' => 'admin@mzvms.online',
+            'smtp_pass' => 'qdll enqr yyap xdnk',
             'smtp_port' => 465,
             'smtp_crypto' => 'ssl',
             'mailtype'  => 'html',
@@ -61,7 +79,7 @@ class Test extends CI_Controller
 
         $this->email->initialize($config);
 
-        $this->email->from("no-reply@mzvms.online", "Test MzVMS");
+        $this->email->from("no-reply@mzvms.online", "MzVMS");
         $this->email->to($sendto);
         if ($is_cc) {
             $emailcckoma   = str_replace(";",",",$emailcc);
@@ -69,7 +87,7 @@ class Test extends CI_Controller
         }
 
         if ($status == 'ok') {
-            $this->email->subject('Test 4 MzVms');
+            $this->email->subject('MzVms Mantab');
             $this->email->message($msg);
         }
 

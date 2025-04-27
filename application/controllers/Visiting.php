@@ -100,6 +100,7 @@ class Visiting extends CI_Controller
 				
 				$invitation= ($data['IsInv']>0)?$data['InvBy']:'No';
 
+				$nestedData['Action']				= $action;
                 $nestedData['No']					= "<p align='right'>".$data['Id']."&nbsp;</p>";
                 $nestedData['HostName']				= $data['HostName'];
                 $nestedData['SourceCompany']		= $data['SourceCompany'];
@@ -108,8 +109,7 @@ class Visiting extends CI_Controller
 				$nestedData['Nama']					= $data['Nama'];
 				$nestedData['PhoneNumber']			= $data['PhoneNumber'];
 				$nestedData['SourceTypeName']		= $data['SourceTypeName'];
-				$nestedData['Invitation']			=  "<p align='center'>".$invitation."</p>";
-				$nestedData['Action']				= $action;
+				$nestedData['Invitation']			=  "<p align='center'>".$invitation."</p>";				
 
 				$datatables[] = $nestedData;
 			endforeach;

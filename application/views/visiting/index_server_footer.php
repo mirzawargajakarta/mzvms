@@ -14,6 +14,7 @@
 				<table class="table table-hover table-bordered w-100 text-nowrap" id="vistable">
 					<thead class="bg-success text-white  text-center">
 						<tr>
+							<th scope="col" class="td-aksi">Action</th>
 							<th scope="col">#</th>
 							<th scope="col">Host</th>
 							<th scope="col">Host Department</th>
@@ -22,8 +23,7 @@
 							<th scope="col">Company Type</th>
 							<th scope="col">Phone</th>
 							<th scope="col">Purpose</th>
-							<th scope="col">Inv</th>
-							<th scope="col" class="td-aksi">Action</th>
+							<th scope="col">Inv</th>							
 						</tr>
 					</thead>
 				</table>
@@ -70,6 +70,7 @@ $(document).ready(function() {
 			"type": "POST"
 		},
 		"columns": [
+			{ "data": "Action" },
 			{ "data": "No" },
 			{ "data": "HostName" },
 			{ "data": "TargetVisitorType" },
@@ -78,8 +79,7 @@ $(document).ready(function() {
 			{ "data": "SourceTypeName" },
 			{ "data": "PhoneNumber" },
 			{ "data": "PurposeVisit" },
-			{ "data": "Invitation" },
-			{ "data": "Action" },
+			{ "data": "Invitation" },			
 		],
         "order": [[0, 'desc']],
         // "ordering": false, // Ordering (Sorting on Each Column)will Be Disabled
