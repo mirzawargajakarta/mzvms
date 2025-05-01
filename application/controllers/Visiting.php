@@ -135,9 +135,127 @@ class Visiting extends CI_Controller
 	{
 		$data['title'] = 'Visitment Data Edit';
 		$data['data']	= $this->_getVisitorTransDetail($id);
+		$data['hostdepartmentdata']	= $this->_getTargetType();
+		$data['purposedata']		= $this->_getPurpose();
+		$data['companytypedata']	= $this->_getSourceType();
+		$data['notelpdata']			= $this->_getPhoneNumber();
 		$this->load->view('templates/header', $data);
 		$this->load->view('visiting/edit_v', $data);
 		$this->load->view('templates/foot', $data);
+	}
+
+	function _getTargetType()
+	{
+		$sql = "SELECT Id, TargetVisitorType, TargetVisitorDesc FROM targettypemst ORDER BY TargetVisitorType";
+		$query = $this->db->query($sql);
+		$result = $query->result_array();
+		return $result;
+	}
+
+	function _getPurpose()
+	{
+		$sql = "SELECT Id, PurposeVisit, PurposeDesc FROM purposemst ORDER BY PurposeVisit";
+		$query = $this->db->query($sql);
+		$result = $query->result_array();
+		return $result;
+	}
+
+	function _getPhoneNumber()
+	{
+		$sql = "SELECT Id, Nama, Gender, PhoneNumber, Email, Alamat, IDCard FROM visitormst ORDER BY Id";
+		$query = $this->db->query($sql);
+		$result = $query->result_array();
+		return $result;
+	}
+
+	function _getSourceType()
+	{
+		$sql = "SELECT Id, SourceTypeName, SourceTypeDesc FROM sourcetypemst ORDER BY SourceTypeName";
+		$query = $this->db->query($sql);
+		$result = $query->result_array();
+		return $result;
+	}
+
+	public function simpanedit()
+	{
+		$visitorid			= $this->input->post('visitorid');
+		$isnewphonenumber	= $this->input->post('newphonenumber');
+		$notelepon			= $this->input->post('notelepon');
+		$fullname			= $this->input->post('fullname');
+		$idcardno			= $this->input->post('idcardno');
+		$gender				= $this->input->post('gender');
+		$email				= $this->input->post('email');
+		$address			= $this->input->post('address');
+		$negara				= $this->input->post('negara');
+		$company			= $this->input->post('company');
+		$companytype		= $this->input->post('companytype');
+		$hostname			= $this->input->post('hostname');
+		$hostdepartment		= $this->input->post('hostdepartment');
+		$purpose			= $this->input->post('purpose');
+		$notes				= $this->input->post('notes');
+		$img				= $this->input->post('image');
+
+		$checkintime			= date("Y-m-d H:i:s");
+		$checkintime_indformat	= date("j M Y H:i:s");
+		$now					= date("Ymd_His");
+		if(!is_null($notelepon)) {			
+			//--- SIMPAN FILE GAMBAR di FOLDER			
+			$folderPath		= FCPATH."assets/uploads/checkin/";	
+			$image_parts	= explode(";base64,", $img);
+			if(isset($image_parts[1])) {
+				$image_base64	= base64_decode($image_parts[1]);			
+				$fileName		= 'CI'.$now.'_'.$notelepon.'.png';	
+				$file			= $folderPath . $fileName;
+				file_put_contents($file, $image_base64);
+			} else {
+				$fileName		= '';
+			}
+			//-- eo SIMPAN FILE GAMBAR...
+			$dataqr = 'VS'.$now.'_'.$notelepon;			
+			//-------------SIMPAN DATA --------------
+			$this->db->trans_start(); //-START TRANSAKSI 
+
+			$datavisitormaster	= array(
+				'Nama'			=> $fullname,
+				'Gender'		=> $gender,
+				'PhoneNumber'	=> $notelepon,
+				'Email'			=> $email,
+				'IDCard'		=> $idcardno,
+				'Alamat'		=> $address,
+				'Negara'		=> $negara
+			);
+			if($isnewphonenumber) {
+				$this->db->insert('visitormst', $datavisitormaster);
+				$visitorid	= $this->_getLastInsertID();
+			} else {
+				$this->db->update('visitormst', $datavisitormaster, array('Id'	=> $visitorid));
+			}
+
+			$datavisitortrans	= array(
+									'CheckInTime'	=> $checkintime, 
+									'IsInside'		=> 1, 
+									'VisitormstId'	=> $visitorid, 
+									'StatusVisit'	=> 'N', //N -> Undangan belum ada kunjungan, Y -> Undangan sudah ada kunjungan 
+									'SourceCompany'	=> $company, 
+									'SourcetypemstId'=> $companytype, 
+									'HostName'		=> $hostname, 
+									'TargettypemstId'=> $hostdepartment, 
+									'PurposemstId'	=> $purpose, 
+									'PVDescription'	=> $notes, 
+									'TempBody'		=> '0.00', 
+									'IsInv'			=> 0, 
+									'QRCode'		=> $dataqr,
+									'FileCI'		=> $fileName
+								);
+			$this->db->insert('visitortrans', $datavisitortrans);			
+
+			$this->db->trans_complete(); //--END TRANSAKSI
+			//---eo SIMPPAN DATA...-------------------
+			echo json_encode(['status' => 'success', 'message' => 'Data Saved!', 'qrcode' => $dataqr]);
+		} else {
+			echo json_encode(['status' => 'failed', 'message' => 'Error on data process']);
+		}
+
 	}
 
 	function _getVisitorTransDetail($idvistrans)
