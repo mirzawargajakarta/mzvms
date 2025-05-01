@@ -54,7 +54,7 @@
             ];
             
             dataPengunjung.forEach((item, index) => {
-                labels.push(item.negara);
+                labels.push(item.negara+ ' '+item.total);
                 data.push(item.total);
             });
             
@@ -73,9 +73,10 @@
                 options: {
                     responsive: true,
                     plugins: {
-                        legend: {
-                            position: 'right',
-                        },
+						legend : {
+							display: true,
+							position: 'right'
+						},
                         title: {
                             display: true,
                             text: 'Distribusi Pengunjung Hotel Tahun <?php echo $tahun_selected; ?>',
@@ -90,7 +91,7 @@
                                     const value = context.raw || 0;
                                     const total = context.dataset.data.reduce((a, b) => parseInt(a) + parseInt(b), 0);
                                     const percentage = Math.round((value / total) * 100);
-                                    return `${label}: ${value} (${percentage}%)`;
+                                    return `${label}: (${percentage}%)`;
                                 }
                             }
                         }
