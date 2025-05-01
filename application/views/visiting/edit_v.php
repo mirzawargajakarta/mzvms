@@ -19,7 +19,7 @@
 							<button type="button" class="btn btn-outline-success" id="custom-button">
 								Upload File CheckIn<i class="fas fa-upload ml-2"></i>
 							</button>
-							<span id="custom-text" class="text-secondary ml-2">Tidak ada file yang diupload</span>
+							<span id="custom-text" class="text-secondary ml-2">No File Uploaded</span>
 						</div>
                         <div class="form-group">
 							<?php
@@ -37,7 +37,7 @@
 							<button type="button" class="btn btn-outline-success" id="custom-button2">
 								Upload File CheckOut<i class="fas fa-upload ml-2"></i>
 							</button>
-							<span id="custom-text2" class="text-secondary ml-2">Tidak ada file yang diupload</span>
+							<span id="custom-text2" class="text-secondary ml-2">No File Uploaded</span>
 						</div>
 						<div class="form-group">
 							<?php
