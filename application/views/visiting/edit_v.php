@@ -206,7 +206,7 @@ realFileBtn.addEventListener("change", function () {
 			/[\/\\]([\w\d\s\.\-\(\)]+)$/
 		)[1];
 	} else {
-		customTxt.innerHTML = "Tidak ada file yang diupload";
+		customTxt.innerHTML = "No File Uploaded";
 	}
 });
 
@@ -225,7 +225,7 @@ realFileBtn2.addEventListener("change", function () {
 			/[\/\\]([\w\d\s\.\-\(\)]+)$/
 		)[1];
 	} else {
-		customTxt2.innerHTML = "Tidak ada file yang diupload";
+		customTxt2.innerHTML = "No File Uploaded";
 	}
 });
 // ======== end input type file ========
