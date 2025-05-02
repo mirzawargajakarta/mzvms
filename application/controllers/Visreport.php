@@ -13,11 +13,17 @@ class Visreport extends CI_Controller
     public function index()
     {        
 		$data['title'] = 'Report Visitment';
-
-		$from='2023-01-01 00:00:00'; 
-		$to='2023-02-01 00:00:00';
-
-		$data['hostdept'] = $this->_getDataByHostDepartment($from, $to);
+		$submit	= $this->input->post('submit');
+		if($submit) {
+			$from	= $this->input->post('tglmulai');
+			$to		= $this->input->post('tglberakhir');
+		} else {
+			$from	= '2023-01-01'; 
+			$to		= '2023-02-01';
+		}
+		$data['datefrom']	= $from;
+		$data['dateto']		= $to;
+		$data['hostdept']	= $this->_getDataByHostDepartment($from, $to);
 
         $this->load->view('templates/header', $data);
         $this->load->view('report/index_pertamna_v', $data);

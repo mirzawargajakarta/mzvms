@@ -8,11 +8,33 @@
 			<h1 class="h3 text-black"><?= $title; ?></h1>
 		</div>
 
+		<form action="<?=base_url('visreport')?>" method="post" accept-charset="utf-8">
+		<div class="rounded mt-4 p-4 bg-white shadow-lg ">
+			<div class="col-md-12">
+				<div class="form-row">
+					<div class="form-group col-md-3">
+						<label for="tglmulai"><strong>Start Date</strong></label>
+						<input type="text" name="tglmulai" placeholder="Enter Start Date" id="tglmulai" autocomplete="off" class="form-control datepicker" required value="<?=$datefrom?>">
+					</div>
+					<div class="form-group col-md-3">
+						<label for="tglberakhir"><strong>End Date</strong></label>
+						<input type="text" name="tglberakhir" placeholder="Enter End Date" id="tglberakhir" autocomplete="off" class="form-control datepicker" required value="<?=$dateto?>">
+					</div>
+                </div>
+				<div class="form-row">
+					<div class="form-group col-md-4">
+						<input type="submit" name="submit" value="Generate Report" class="btn btn-primary">
+					</div>
+				</div>
+			</div>
+		</div>
+		</form>
+
 		<div class="row mt-3 justify-content-center">
 			<div class="col-md-8">
 				<div class="card card-danger">
 					<div class="card-header">
-						<h3 class="card-title">By Target Visitor Chart Jan 2023</h3>
+						<h3 class="card-title">By Target Chart Periode <?=$datefrom?> to <?=$dateto?></h3>
 
 						<div class="card-tools">
 							<button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
@@ -21,7 +43,7 @@
 					</div>
 					<div class="card-body">
 						<div class="chart">
-							<canvas id="pieChart" style="min-height: 250px; height: 350px; max-height: 350px; max-width: 100%;"></canvas>
+							<canvas id="pieChart" style="min-height: 250px; height: 480px; max-height: 480px; max-width: 100%;"></canvas>
 						</div>
 					</div>
 				</div>
@@ -30,7 +52,7 @@
 			<div class="col-md-4">
 				<div class="card card-warning">
 					<div class="card-header">
-						<h3 class="card-title">By Target Visitor Table Jan 2023</h3>
+						<h3 class="card-title">By Target Table  Periode <?=$datefrom?> to <?=$dateto?></h3>
 
 						<div class="card-tools">
 							<button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i></button>
@@ -90,10 +112,8 @@
 
 <script>
   $(function () {
-              // Data dari controller
-			  const hostdept = <?php echo json_encode($hostdept); ?>;
+			const hostdept = <?php echo json_encode($hostdept); ?>;
             
-            // Siapkan data untuk chart
             const labels = [];
             const data = [];
             const backgroundColors = [
