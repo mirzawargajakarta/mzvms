@@ -21,7 +21,7 @@
 				width: 100%;
 				border: none;
 				border-radius: 10px;
-				background-color: #01A49C;
+				background-color:#094d4d;
 				color: white;
 				padding: 14px 28px;
 				font-size: 32px;
@@ -31,7 +31,7 @@
 				text-align: center;
 			}
 			.block:hover {
-				background-color: #01ADA5;
+				background-color:rgb(0, 114, 108);
 				color: #3A3533;
 			}
 		</style>
