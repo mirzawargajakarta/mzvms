@@ -136,8 +136,10 @@ class Invite extends CI_Controller
             foreach($data_arr as $data) :
 				$no++;
 
-				$action	= 
-				   "<a href='#' class='get-detail btn btn-outline-info' data-id='".$data['Id']."' data-toggle='modal' data-target='#get-detail'>
+				$action	= "<a href='#' class='send-msg btn btn-outline-primary' data-id='".$data['Id']."' data-content='".$data['EventName']."'>
+						<i class='fas fa-paper-plane' data-placement='bottom'></i>
+					</a>
+					<a href='#' class='get-detail btn btn-outline-info' data-id='".$data['Id']."' data-toggle='modal' data-target='#get-detail'>
 						<i class='fas fa-eye pop' data-toggle='popover' data-placement='bottom' data-content='Detail'> </i>
 					</a>
 					<a href='".base_url('invite/edit/'. $data['Id'])."' class='btn btn-outline-warning'>
@@ -175,6 +177,19 @@ class Invite extends CI_Controller
 	    $row    = $qry->result_array();
 	    return $row[0]['LastInsertedID'];
 	}
+
+	public function sendmsg()
+    {
+		$encode	= $this->input->get('mzvms');
+		$id	= urldecode($encode);
+        $where = ['Id' => $id];
+		$data = ['status' => 1];
+		$this->Default_m->update('invitemst', $where, $data);
+
+        if ($this->db->affected_rows() > 0) {
+            redirect('invite');
+        }
+    }
 
 	public function hapus()
     {

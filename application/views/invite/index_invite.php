@@ -106,6 +106,26 @@ $(document).ready(function() {
 
 		});
 
+	$('#invtable').on('click', '.send-msg', function(e) {
+		e.preventDefault();
+		const id = $(this).data('id');
+		const content = $(this).data('content');
+		Swal.fire({
+			title: 'Are you sure !',
+			text: "Send invitation '" + content + "' by wa and email",
+			type: 'warning',
+			showCancelButton: true,
+			confirmButtonColor: '#31B831',
+			cancelButtonColor: '#d33',
+			confirmButtonText: 'Send'
+		}).then((result) => {
+			if (result.isConfirmed) {
+				const encoded = encodeURI(id);
+				document.location.href = '<?=base_url("invite/sendmsg/?mzvms=");?>'+encoded;
+			}
+		})
+	});	
+
 });
 
 </script>
