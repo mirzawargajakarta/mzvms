@@ -45,8 +45,7 @@
 <div class="col-md-12">
 <div class="card">
 <header class="card-header">
-	<a href="<?= base_url('frontmenu');?>" class="float-right btn btn-outline-primary mt-1">Back</a>
-	<h4 class="card-title mt-2">Registration</h4>
+	<h4 class="card-title mt-2">Confirmation Registration</h4>
 </header>
 <article class="card-body">
 <form id="registerForm">
@@ -55,6 +54,7 @@
 
 	<div class="form-row">
 		<div class="col-md-8">
+			Please take picture of your ID Card
 			<div id="my_camera"></div>			
 			<input type="hidden" name="image" class="image-tag">
 		</div> 
@@ -65,8 +65,8 @@
 	<br />
 	<div class="form-row">
 		<div class="form-group col-md-6">
-		  <label>Phone Number</label>
-		  <input type="text" id="notelepon" name="notelepon" class="form-control allownumericwithoutdecimal" placeholder="">
+		  <label>ID Card Number</label>
+		  <input type="text" id="idcardno" name="idcardno" placeholder="" class="form-control">
 		</div>
 	</div> 
 	<div class="form-row">
@@ -75,8 +75,8 @@
 		  	<input type="text" class="form-control" id="fullname" name="fullname" placeholder="">
 		</div> 
 		<div class="col form-group col-md-4">
-			<label>ID Card Number</label>   
-		  	<input type="text" id="idcardno" name="idcardno" placeholder="" class="form-control">
+			<label>Phone Number</label>		  	
+		  	<input type="text" id="notelepon" name="notelepon" class="form-control allownumericwithoutdecimal" placeholder="">
 		</div> 
 	</div> 
 
@@ -125,39 +125,6 @@
 		</div> 
 	</div> 
 
-<!-- ========================================= -->
-<div class="form-row">
-	<div class="col form-group col-md-6">
-		<label>Company Name</label>   
-		<input type="text" id="company" name="company" placeholder="" class="form-control">		
-	</div> 
-	<div class="form-group col-md-6">
-		<label>Company Type</label>
-		<?=form_dropdownDB_init('companytype', $companytypedata, 'Id', 'SourceTypeName', '','','', "id='companytype' class='selectform form-control'");?>	
-		<label for="companytype" class="error"></label>
-	</div> 
-</div> 
-
-<div class="form-row">
-	<div class="col form-group col-md-6">
-		<label>Host Name</label>   
-		<input type="text" id="hostname" name="hostname" placeholder="" class="form-control">
-	</div> 
-	<div class="form-group col-md-6">
-		<label>Department</label>
-		<?=form_dropdownDB_init('hostdepartment', $hostdepartmentdata, 'Id', 'TargetVisitorType', '','','', "id='hostdepartment' class='selectform form-control'");?>	
-		<label for="hostdepartment" class="error"></label>
-	</div> 
-</div>
-
-<div class="form-row">
-	<div class="form-group col-md-6">
-		<label>Purpose Visit</label>
-		<?=form_dropdownDB_init('purpose', $purposedata, 'Id', 'PurposeVisit', '', '','',"id='purpose' class='selectform form-control'");?>	
-		<label for="purpose" class="error"></label>
-	</div> 
-</div> 
-<!-- ========================================= -->
 	<div class="form-group">
 		<label>Notes</label>
 		<textarea class="form-control" id="notes" name="notes" placeholder=""></textarea>
@@ -165,12 +132,11 @@
 	</div> 
 
     <div class="form-group">
-		<button type="submit" class="btn btn-primary btn-block">CHECK IN</button>
+		<button type="submit" class="btn btn-primary btn-block">SAVE</button>
     </div>
 </form>
 </article> 
 
-<div class="border-top card-body text-center">Have an account? <a href="<?= base_url('login')?>">Log In</a></div>
 </div> <!-- card.// -->
 </div> <!-- col.//-->
 
@@ -185,7 +151,7 @@
         width: 420,
         height: 320,
         image_format: 'jpeg',
-		constraints :{  facingMode:'user' }, //using 'environment' instead of 'user'' to use rear camera for mobile phone
+		constraints :{  facingMode:'environment' }, //using 'environment' instead of 'user'' to use rear camera for mobile phone
         jpeg_quality: 90
     });
   
@@ -226,12 +192,7 @@
 					required: true,
 					minlength: 3
 				},
-				negara:  "required",
-				company:  "required",
-				companytype:  "required",
-				hostname:  "required",
-				hostdepartment:  "required",
-				purpose:  "required"
+				negara:  "required"
 			},
 			messages: {				
 				notelepon: "Phone Number must not be blank",
@@ -246,16 +207,11 @@
 					required: "Address must not be blank",
 					minlength:  "Minimum 2 chars"
 				},
-				negara: "Country must be selected",
-				company: "Company must not be blank",
-				companytype:  "Company Type must be selected",
-				hostname:  "Hostname must not be blank",
-				hostdepartment:  "Department must be selected",
-				purpose:  "Purpose must be selected"
+				negara: "Country must be selected"
 			},
 			submitHandler: function (form) {
 					$.ajax({
-					url: '<?= base_url("frontmenu/checkin");?>',
+					url: '<?= base_url("visitregis/konfirmasisave");?>',
 					type: 'POST',
 					data: $(form).serialize(),
 					success: function (response) {
@@ -266,12 +222,12 @@
 								title: "Success!",
 								text: res.message,
 								showConfirmButton: true,
-								confirmButtonText: "Print QR",
+								confirmButtonText: "Send QR Code To WA and Email",
 								showCancelButton: true,
 								cancelButtonText: "Don't Print"
 							}).then((result) => {
 								if (result.isConfirmed) {
-									<?php $backurl	= base_url('frontmenu/printQR/?qrcode='); ?>
+									<?php $backurl	= base_url('visitregis/printQR/?qrcode='); ?>
 									var uriencode = encodeURI(res.qrcode);
 									window.location.href = '<?=$backurl?>'+uriencode;
 								}
