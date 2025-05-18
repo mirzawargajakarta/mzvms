@@ -20,10 +20,34 @@ class Test extends CI_Controller
 
 		public function index()
     {
+			//=====BUAT QRCODE=============
+		$this->load->library('ciqrcode');
+		$qrcode = '001test';
+		$qrfolder				= FCPATH."assets/uploads/qrcode/";
+		$config['cacheable']    = true;
+		$config['imagedir']     = $qrfolder;
+		$config['quality']      = true;
+		$config['size']         = '1024';
+		$config['black']        = array(224, 255, 255);
+		$config['white']        = array(70, 130, 180);
+		$this->ciqrcode->initialize($config);
+
+		$qrimage_name		= 'INV'.$qrcode.'.png';
+		$params['data'] 	= $qrcode;
+		$params['level'] 	= 'H'; //H=High Quality
+		$params['size'] 	= 4;
+		$params['savename'] = $qrfolder . $qrimage_name;
+		$this->ciqrcode->generate($params);
+		//======eo BUAT QRCODE...===========================
+		$urlimage= base_url('assets/uploads/qrcode/').$qrimage_name;
+
 			$email= "ahmad.mirza@sarana-jaya.co.id";
 				$emailcc='';
-				$msg ="<html><body><h2>TES MZVMS</h2></body></html>";
+				$msg ="<html><body><h2>TES QRCODE inv</h2><br><img src='".$urlimage."' width='70' height='80'></body></html>";
 				$this->_sendEmail($email, $emailcc, 'ok', $msg);
+
+				$wamsg	= "Berikut qrcode\nbaris ke dua";
+				$this->_sendWAwithFileAttch('081398081536',$wamsg, $urlimage);
     }
 
 		public function __index()
@@ -34,7 +58,36 @@ class Test extends CI_Controller
 			$this->_sendWA($no, $msg);
     }
 
-		function _sendWA($nohp, $msg)
+		function _sendWAwithFileAttch($nohp, $msg, $urlimage)
+		{
+			$curl = curl_init();
+
+			curl_setopt_array($curl, array(
+					CURLOPT_URL 						=> 'https://app.saungwa.com/api/create-message',
+					CURLOPT_RETURNTRANSFER 	=> true,
+					CURLOPT_ENCODING 				=> '',
+					CURLOPT_MAXREDIRS 			=> 10,
+					CURLOPT_TIMEOUT 				=> 0,
+					CURLOPT_FOLLOWLOCATION 	=> true,
+					CURLOPT_HTTP_VERSION 		=> CURL_HTTP_VERSION_1_1,
+					CURLOPT_CUSTOMREQUEST 	=> 'POST',
+					CURLOPT_POSTFIELDS 			=> array(
+							'appkey' 	=> 'f1292ea6-5001-4a34-87e7-78dec18993df',
+							'authkey' => 'QmxImxBV4tKMSOXx3cXbklueFh1gnjLI3jANxscthSOJoqOq2S',
+							'to' 			=> $nohp,
+							'message' => $msg,
+							'file' 		=> $urlimage,
+							'sandbox' => 'false'
+						),
+					)
+			);
+
+			$response = curl_exec($curl);
+			curl_close($curl);
+			// echo $response;
+		}
+
+		function _sendWANoFile($nohp, $msg)
 		{
 			$curl = curl_init();
 
@@ -59,7 +112,7 @@ class Test extends CI_Controller
 			$response = curl_exec($curl);
 
 			curl_close($curl);
-			echo $response;
+			// echo $response;
 		}
 
 		function _sendEmail($sendto, $emailcc, $status, $msg)
@@ -87,7 +140,7 @@ class Test extends CI_Controller
         }
 
         if ($status == 'ok') {
-            $this->email->subject('MzVms Mantab');
+            $this->email->subject('MzVms inv QRCODE');
             $this->email->message($msg);
         }
 
