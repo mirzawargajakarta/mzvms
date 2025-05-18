@@ -43,7 +43,7 @@ class Test extends CI_Controller
 
 			$email= "ahmad.mirza@sarana-jaya.co.id";
 				$emailcc='';
-				$msg ="<html><body><h2>TES QRCODE inv</h2><br><img src='".$urlimage."' width='70' height='80'></body></html>";
+				$msg ="<html><body><h2>TES QRCODE inv</h2><br><img src='".$urlimage."'></body></html>";
 				$this->_sendEmail($email, $emailcc, 'ok', $msg);
 
 				$wamsg	= "Berikut qrcode\nbaris ke dua";
