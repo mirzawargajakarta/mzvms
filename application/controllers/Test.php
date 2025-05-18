@@ -50,12 +50,12 @@ class Test extends CI_Controller
 				$this->_sendWAwithFileAttch('081398081536',$wamsg, $urlimage);
     }
 
-		public function __index()
+		public function wadoang()
     {
 			$no='6281398081536';
-			$msg='Ini Test ke duaPake php';
+			$msg='Ini Test ke tigaPake php';
 
-			$this->_sendWA($no, $msg);
+			$this->_sendWANoFile($no, $msg);
     }
 
 		function _sendWAwithFileAttch($nohp, $msg, $urlimage)
@@ -82,7 +82,8 @@ class Test extends CI_Controller
 					)
 			);
 
-			$response = curl_exec($curl);
+			// $response = curl_exec($curl);
+			curl_exec($curl);
 			curl_close($curl);
 			// echo $response;
 		}
@@ -109,8 +110,8 @@ class Test extends CI_Controller
 				),
 			));
 
-			$response = curl_exec($curl);
-
+			// $response = curl_exec($curl);
+			curl_exec($curl);
 			curl_close($curl);
 			// echo $response;
 		}
