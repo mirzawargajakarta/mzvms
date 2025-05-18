@@ -39,15 +39,17 @@ class Test extends CI_Controller
 		$params['savename'] = $qrfolder . $qrimage_name;
 		$this->ciqrcode->generate($params);
 		//======eo BUAT QRCODE...===========================
+		$filepath	= $qrfolder . $qrimage_name;
 		$urlimage= base_url('assets/uploads/qrcode/').$qrimage_name;
 
 			$email= "ahmad.mirza@sarana-jaya.co.id";
 				$emailcc='';
-				$msg ="<html><body><h2>TES QRCODE inv</h2><br><img src='".$urlimage."'></body></html>";
-				$this->_sendEmail($email, $emailcc, 'ok', $msg);
+				$msg ="<html><body><h2>TES QRCODE kedua</h2></body></html>";
+				
+				$this->_sendEmail($email, $emailcc, 'ok', $msg, $filepath);
 
-				$wamsg	= "Berikut qrcode\nbaris ke dua";
-				$this->_sendWAwithFileAttch('6281398081536',$wamsg, $urlimage);
+				$wamsg	= "Berikut test lagi qrcode\nbaris ke dua";
+				$this->_sendWAwithFileAttch('6281398081536',$wamsg, $filepath);
     }
 
 		public function wadoang()
@@ -116,9 +118,10 @@ class Test extends CI_Controller
 			// echo $response;
 		}
 
-		function _sendEmail($sendto, $emailcc, $status, $msg)
+		function _sendEmail($sendto, $emailcc, $status, $msg, $pathfile='')
     {
         $is_cc = ($emailcc == '') ? false : true;
+				$is_attch = ($pathfile == '') ? false : true;
         $config = [
             'protocol'  => 'smtp',
             'smtp_host' => 'smtp.googlemail.com',
@@ -143,6 +146,9 @@ class Test extends CI_Controller
         if ($status == 'ok') {
             $this->email->subject('MzVms inv QRCODE');
             $this->email->message($msg);
+						if($is_attch){
+							$this->email->attach($pathfile);
+						}
         }
 
         if ($this->email->send()) {
