@@ -49,7 +49,7 @@ class Test extends CI_Controller
 				$this->_sendEmail($email, $emailcc, 'ok', $msg, $filepath);
 
 				$wamsg	= "Berikut test lagi qrcode\nbaris ke dua";
-				$this->_sendWAwithFileAttch('6281398081536',$wamsg, $filepath);
+				$this->_sendWAwithFileAttch('6281398081536',$wamsg, $urlimage);
     }
 
 		public function wadoang()
