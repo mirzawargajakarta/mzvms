@@ -1,4 +1,5 @@
 <link rel="icon" href="<?= base_url('assets/img/24506d8768900869e2f21fc018cc1a5e.png'); ?>">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -49,7 +50,7 @@
 </header>
 <article class="card-body">
 <form id="registerForm">
-<input type="hidden" id="visitorid" name="visitorid" value="N">
+<input type="hidden" id="invdtlid" name="invdtlid" value="<?=$invdtlid?>">
 <input type="hidden" id="newphonenumber" name="newphonenumber" value="1">
 
 	<div class="form-row">
@@ -76,7 +77,7 @@
 		</div> 
 		<div class="col form-group col-md-4">
 			<label>Phone Number</label>		  	
-		  	<input type="text" id="notelepon" name="notelepon" class="form-control allownumericwithoutdecimal" placeholder="">
+		  	<input type="text" id="notelepon" name="notelepon" value="<?=$VisitorWA?>" class="form-control" readonly>
 		</div> 
 	</div> 
 
@@ -96,7 +97,7 @@
 
 	<div class="form-group">
 		<label>Email address</label>
-		<input type="email" class="form-control" id="email" name="email" placeholder="">
+		<input type="email" class="form-control" id="email" name="email" value="<?=$VisitorEmail?>">
 	</div> 	
 
 	<div class="form-row">
@@ -132,7 +133,7 @@
 	</div> 
 
     <div class="form-group">
-		<button type="submit" class="btn btn-primary btn-block">SAVE</button>
+		<button type="submit" id="submitbtn" class="btn btn-primary btn-block">SAVE</button>
     </div>
 </form>
 </article> 
@@ -180,7 +181,6 @@
 	$(document).ready(function() {
 		$('#registerForm').validate({
 			rules: {
-				notelepon: "required",
 				fullname:  "required",
 				idcardno: {
 					required: true,
@@ -195,7 +195,6 @@
 				negara:  "required"
 			},
 			messages: {				
-				notelepon: "Phone Number must not be blank",
 				fullname: "Fullname must not be blank",
 				idcardno: {
 					required: "ID Card number must not be blank",
@@ -210,6 +209,8 @@
 				negara: "Country must be selected"
 			},
 			submitHandler: function (form) {
+					$("#submitbtn").html("<i class='fa fa-refresh fa-spin'></i>..Wait for Processing..");
+					$("#submitbtn").prop("disabled",true);
 					$.ajax({
 					url: '<?= base_url("visitregis/konfirmasisave");?>',
 					type: 'POST',
@@ -217,12 +218,13 @@
 					success: function (response) {
 						let res = JSON.parse(response);
 						if (res.status === 'success') {
+							$("#submitbtn").html("DONE");
 							Swal.fire({
 								icon: "success",
 								title: "Success!",
 								text: res.message,
 								showConfirmButton: true,
-								confirmButtonText: "Send QR Code To WA and Email",
+								confirmButtonText: "Print QR",
 								showCancelButton: true,
 								cancelButtonText: "Don't Print"
 							}).then((result) => {
@@ -246,55 +248,10 @@
 			}
 		});
 
-		$("#notelepon").focus();
-
-		$('#notelepon').on("blur", function(e) { 
-			var nomortelp = $(this).val();                
-			$.ajax({
-				url: '<?= base_url("frontmenu/getVisitorDetail");?>', 
-				method: 'POST',
-				data: { notelp: nomortelp },
-				dataType: 'json',
-				success: function(data) {
-					var Gender = data.Gender;
-					if(Gender == 'M') {
-						$( "#male" ).prop( "checked", true );
-						$( "#female" ).prop( "checked", false );
-					} else if (Gender == 'F') {
-						$( "#male" ).prop( "checked", false );
-						$( "#female" ).prop( "checked", true );
-					} else {
-						$( "#male" ).prop( "checked", false );
-						$( "#female" ).prop( "checked", false );
-					}
-					$('#newphonenumber').val(data.isNew);
-					$('#fullname').val(data.Nama);						
-					$('#email').val(data.Email);
-					$('#address').val(data.Alamat);
-					$('#idcardno').val(data.IDCard);
-					$('#visitorid').val(data.Id);
-					$('#negara').val(data.Negara).change();
-				}				
-			});
-		});
+		$("#idcardno").focus();
 
 		$('#negara').select2({
 			placeholder: "Choose Country",
-			allowClear: true
-		});
-
-		$('#hostdepartment').select2({
-			placeholder: "Choose Host Department",
-			allowClear: true
-		});
-
-		$('#companytype').select2({
-			placeholder: "Choose Company Type",
-			allowClear: true
-		});
-
-		$('#purpose').select2({
-			placeholder: "Choose Purpose",
 			allowClear: true
 		});
 	});
