@@ -161,26 +161,23 @@ class Visitregis extends CI_Controller
 	function _sendWAwithFileAttch($nohp, $qrimagefilename)
 	{
 		$urlimage = base_url('assets/uploads/qrcode/').$qrimagefilename;
-		$msg = "This is your QRTicket for check in process.\n
-				Disclaimer :\n
-				This registration is only valid for check in process at PETRONAS Security Post 3rd floor.
-				You are still required to register at the Talavera Building Receptionist on the 2nd floor.";
+		$msg = "This is your QRTicket for check in process.\nDisclaimer :\nThis registration is only valid for check in process at PETRONAS Security Post 3rd floor.You are still required to register at the Talavera Building Receptionist on the 2nd floor.";
 		$curl = curl_init();
 		curl_setopt_array($curl, array(
-				CURLOPT_URL 						=> 'https://app.saungwa.com/api/create-message',
+				CURLOPT_URL 			=> 'https://app.saungwa.com/api/create-message',
 				CURLOPT_RETURNTRANSFER 	=> true,
-				CURLOPT_ENCODING 				=> '',
-				CURLOPT_MAXREDIRS 			=> 10,
-				CURLOPT_TIMEOUT 				=> 0,
+				CURLOPT_ENCODING 		=> '',
+				CURLOPT_MAXREDIRS 		=> 10,
+				CURLOPT_TIMEOUT 		=> 0,
 				CURLOPT_FOLLOWLOCATION 	=> true,
-				CURLOPT_HTTP_VERSION 		=> CURL_HTTP_VERSION_1_1,
+				CURLOPT_HTTP_VERSION 	=> CURL_HTTP_VERSION_1_1,
 				CURLOPT_CUSTOMREQUEST 	=> 'POST',
-				CURLOPT_POSTFIELDS 			=> array(
-						'appkey' => 'f1292ea6-5001-4a34-87e7-78dec18993df',
-				'authkey' => 'QmxImxBV4tKMSOXx3cXbklueFh1gnjLI3jANxscthSOJoqOq2S',
-						'to' 			=> $nohp,
+				CURLOPT_POSTFIELDS 		=> array(
+						'appkey'  => 'f1292ea6-5001-4a34-87e7-78dec18993df',
+				        'authkey' => 'QmxImxBV4tKMSOXx3cXbklueFh1gnjLI3jANxscthSOJoqOq2S',
+						'to' 	  => $nohp,
 						'message' => $msg,
-						'file' 		=> $urlimage,
+						'file' 	  => $urlimage,
 						'sandbox' => 'false'
 					),
 				)
@@ -297,7 +294,8 @@ class Visitregis extends CI_Controller
 		echo 'ok 1';
 	}
 
-	function _clean($string) {
+	function _clean($string) 
+	{
 		$string = str_replace(' ', '', $string); // Replaces all spaces with hyphens.
 		$string = preg_replace('/[^A-Za-z0-9\-]/', '', $string); // Removes special chars.
 		$string = str_replace('-', '', $string);
@@ -312,6 +310,7 @@ class Visitregis extends CI_Controller
 		 return $result[0]['lii'];
 	 }
 
+/
 // -lom
 	public function registration()
 	{

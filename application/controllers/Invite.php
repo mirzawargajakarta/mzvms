@@ -62,15 +62,13 @@ class Invite extends CI_Controller
 
 			for($i=0; $i<count($nama_arr); $i++) {
 
-				$linkurl	= "url_link".$i;
-				$qrcode		= "INVQRCODE".$i;
+				$linkurl	= md5($idmst.'id'.$i);
 
 				$datadetail	= array(
 						'InvitemstId'	=> $idmst,
 						'VisitorName'	=> $nama_arr[$i],
 						'VisitorWA'		=> $wa_arr[$i],
 						'VisitorEmail'	=> $email_arr[$i],
-						'QRCode'		=> $qrcode,
 						'LinkUrl'		=> $linkurl,
 				);
 				$this->db->insert('invitedtl', $datadetail);
@@ -80,8 +78,7 @@ class Invite extends CI_Controller
 			$this->session->set_flashdata('flash', 'Event Invitation Added');
 			redirect('invite','refresh');		
 		}
-	}
-	
+	}	
 
 	function _getDataIndex()
 	{
@@ -115,7 +112,7 @@ class Invite extends CI_Controller
 		$dir 	= $_POST['order']['0']['dir']; // pengurutan secara ascending atau descending.
 		$search	= $_POST['search']['value']; // data pencarian.		
 
-		$query	= "SELECT t.Id, t.EventDate, t.EventName, t.Description, t.InvMsg, t.Status
+		$query	= "SELECT t.Id, t.EventDate, DATE(NOW()) AS Today, t.EventName, t.Description, t.InvMsg, t.Status
 				FROM invitemst t ";
 
 		$totalData	= $this->db->query($query)->num_rows();
@@ -136,27 +133,32 @@ class Invite extends CI_Controller
             foreach($data_arr as $data) :
 				$no++;
 
-				$action	= "<a href='#' class='send-msg btn btn-outline-primary' data-id='".$data['Id']."' data-content='".$data['EventName']."'>
-						<i class='fas fa-paper-plane' data-placement='bottom'></i>
-					</a>
-					<a href='#' class='get-detail btn btn-outline-info' data-id='".$data['Id']."' data-toggle='modal' data-target='#get-detail'>
-						<i class='fas fa-eye pop' data-toggle='popover' data-placement='bottom' data-content='Detail'> </i>
-					</a>
-					<a href='".base_url('invite/edit/'. $data['Id'])."' class='btn btn-outline-warning'>
-						<i class='fas fa-edit pop' data-toggle='popover' data-placement='bottom' data-content='EDIT'></i>
-					</a>
-					<a href='#' data-id='".$data['Id']."' class='to-delete btn btn-outline-danger'>
-						<i class='fas fa-trash-alt pop' data-toggle='popover' data-placement='bottom' data-content='Delete'></i>
-					</a>";	
+				$status	= $data['Status'];
+				$action	= "";
+				if($status=='0') {
+					$action	.= "<a href='#' class='send-msg btn btn-outline-primary' data-id='".$data['Id']."' data-content='".$data['EventName']."'><i class='fas fa-paper-plane' data-placement='bottom'></i></a>";
+				} else {
+					$action	.= "&nbsp;&nbsp;&nbsp;&nbsp;";
+				}
+
+				$action	.= "<a href='#' class='get-detail btn btn-outline-info' data-id='".$data['Id']."' data-toggle='modal' data-target='#get-detail'>
+								<i class='fas fa-eye pop' data-toggle='popover' data-placement='bottom' data-content='Detail'> </i>
+							</a>
+							<a href='".base_url('invite/edit/'. $data['Id'])."' class='btn btn-outline-warning'>
+								<i class='fas fa-edit pop' data-toggle='popover' data-placement='bottom' data-content='EDIT'></i>
+							</a>
+							<a href='#' data-id='".$data['Id']."' class='to-delete btn btn-outline-danger'>
+								<i class='fas fa-trash-alt pop' data-toggle='popover' data-placement='bottom' data-content='Delete'></i>
+							</a>";	
 				
-				$isSent= ($data['Status']>0)?'Sent':'No';
+				$isSent = ($data['Status']>0)?'Sent':'No';
 
 				$nestedData['Action']			= $action;
                 $nestedData['No']				= "<p align='right'>".$data['Id']."&nbsp;</p>";
                 $nestedData['EventDate']		= $data['EventDate'];
                 $nestedData['EventName']		= $data['EventName'];
 				$nestedData['Description']		= $data['Description'];
-				$nestedData['IsSent']			=  "<p align='center'>".$isSent."</p>";				
+				$nestedData['IsSent']			= "<p align='center'>".$isSent."</p>";				
 
 				$datatables[] = $nestedData;
 			endforeach;
@@ -180,14 +182,38 @@ class Invite extends CI_Controller
 
 	public function sendmsg()
     {
-		$encode	= $this->input->get('mzvms');
-		$id	= urldecode($encode);
-        $where = ['Id' => $id];
-		$data = ['status' => 1];
-		$this->Default_m->update('invitemst', $where, $data);
+		$encode		= $this->input->get('mzvms');
+		$idmst		= urldecode($encode);
+		$datamst	= $this->_getInvMaster($idmst);
+		$datadtl	= $this->_getInvDetail($idmst);
 
+		$date	 	= $datamst['EventDate'];
+		$eventname 	= $datamst['EventName'];
+		$eventdesc 	= $datamst['Description'];
+		$msg_1	 	= $datamst['InvMsg'];
+
+		for ($i = 0; $i < count($datadtl); $i++) {
+			$notelp	= $datadtl[$i]['VisitorWA'];
+			$email	= $datadtl[$i]['VisitorEmail'];
+			$iddtl	= $datadtl[$i]['Id'];
+			$urlid	= $datadtl[$i]['LinkUrl'];
+			$linkurl = base_url('visitregis/index/'.$urlid);s
+			if(strlen($notelp)>9) {	
+				$msg = $msg_1."\nPlease fill up the form to confirm in this link below\n".$linkurl;
+				$this->_sendWANoFile($notelp, $msg);
+			}
+			if(strlen($email)>6) {
+				$msg = "<html><body><p>".$msg_1."</p><p>Please fill up the form to confirm in this link below</p><br>".$linkurl."</body></html>";
+				$this->_sendEmail($email, $eventname, $msg);
+			}
+		}
+
+        $where	= ['Id' => $idmst];
+		$data	= ['status' => 1];
+		$this->Default_m->update('invitemst', $where, $data);
+		
         if ($this->db->affected_rows() > 0) {
-            redirect('invite');
+        	redirect('invite');
         }
     }
 
@@ -239,7 +265,65 @@ class Invite extends CI_Controller
 		return $result;
 	}
 
-//----------------------------------------------- BELOM-----------
+	function _sendWANoFile($nohp, $msg)
+	{
+		$curl = curl_init();
+
+		curl_setopt_array($curl, array(
+			CURLOPT_URL => 'https://app.saungwa.com/api/create-message',
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_ENCODING => '',
+			CURLOPT_MAXREDIRS => 10,
+			CURLOPT_TIMEOUT => 0,
+			CURLOPT_FOLLOWLOCATION => true,
+			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+			CURLOPT_CUSTOMREQUEST => 'POST',
+			CURLOPT_POSTFIELDS => array(
+				'appkey' => 'f1292ea6-5001-4a34-87e7-78dec18993df',
+				'authkey' => 'QmxImxBV4tKMSOXx3cXbklueFh1gnjLI3jANxscthSOJoqOq2S',
+				'to' => $nohp,
+				'message' => $msg,
+				'sandbox' => 'false'
+			),
+		));
+
+		// $response = curl_exec($curl);
+		curl_exec($curl);
+		curl_close($curl);
+		// echo $response;
+	}
+
+	function _sendEmail($sendto, $subject, $msg)
+	{
+		$config = [
+			'protocol'  => 'smtp',
+			'smtp_host' => 'smtp.googlemail.com',
+			'smtp_user' => 'admin@mzvms.online',
+			'smtp_pass' => 'qdll enqr yyap xdnk',
+			'smtp_port' => 465,
+			'smtp_crypto' => 'ssl',
+			'mailtype'  => 'html',
+			'charset'   => 'utf-8',
+			'newline'   => "\r\n"
+		];
+
+		$this->email->initialize($config);
+
+		$this->email->from("no-reply@mzvms.online", "MzVMS");
+		$this->email->to($sendto);
+
+		$this->email->subject('MzVms inv QRCODE');
+		$this->email->message($msg);
+
+		if ($this->email->send()) {
+			return true;
+		} else {
+			echo $this->email->print_debugger();
+			die;
+		}
+	}
+
+    //----------------------------------------------- BELOM-----------
 	public function edit($id)
 	{
 		$data['title'] = 'Visitment Data Edit';
