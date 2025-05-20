@@ -197,7 +197,7 @@ class Invite extends CI_Controller
 			$email	= $datadtl[$i]['VisitorEmail'];
 			$iddtl	= $datadtl[$i]['Id'];
 			$urlid	= $datadtl[$i]['LinkUrl'];
-			$linkurl = base_url('visitregis/index/'.$urlid);s
+			$linkurl = base_url('visitregis/index/'.$urlid);
 			if(strlen($notelp)>9) {	
 				$msg = $msg_1."\nPlease fill up the form to confirm in this link below\n".$linkurl;
 				$this->_sendWANoFile($notelp, $msg);
