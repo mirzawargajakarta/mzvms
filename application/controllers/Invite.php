@@ -312,7 +312,7 @@ class Invite extends CI_Controller
 		$this->email->from("no-reply@mzvms.online", "MzVMS");
 		$this->email->to($sendto);
 
-		$this->email->subject('MzVms inv QRCODE');
+		$this->email->subject($subject);
 		$this->email->message($msg);
 
 		if ($this->email->send()) {
