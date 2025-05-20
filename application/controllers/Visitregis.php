@@ -310,7 +310,6 @@ class Visitregis extends CI_Controller
 		 return $result[0]['lii'];
 	 }
 
-/
 // -lom
 	public function registration()
 	{
