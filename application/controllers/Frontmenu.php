@@ -141,7 +141,8 @@ class Frontmenu extends CI_Controller
 			//undangan
 			if($isInvitation==1 AND $isInside==0 AND $statusVisitedInv=='N') {
 				// invitation_checkin_page
-				echo "invitation_checkin_page";
+				// echo "invitation_checkin_page";
+				$this->_invcheckinpage($idvistrans);
 			}
 
 			if($isInvitation==1 AND $isInside==1 AND $statusVisitedInv=='Y') {
@@ -276,6 +277,28 @@ class Frontmenu extends CI_Controller
 			$this->db->trans_complete(); //--END TRANSAKSI
 			echo "Harus nya sudah berhasil checkout";
 		}
+	}
+
+	function _getInvVisitorDetail($idvistrans)
+	{
+		$sql = "SELECT 	
+				t.Id, t.CheckInTime, t.CheckOutTime, t.IsInside, t.VisitormstId, 
+				t.SourceCompany, t.SourcetypemstId, t.HostName, t.TargettypemstId, 
+				t.PurposemstId, t.PVDescription, t.TempBody, t.AppointmentDate, 
+				t.StatusVisit, t.IsInv, t.QRCode, t.FileCI, t.FileCO,
+				v.Nama, v.Gender, v.PhoneNumber, v.Email, 
+				v.Alamat, v.IDCard, v.FileIDCard,
+				i.InvitemstId, i.VisitorName, i.VisitorWA, i.VisitorEmail,
+				i.StatusWA, i.StatusEmail, i.LinkUrl,
+				m.EventDate, m.EventName, m.Description, m.InvMsg, m.Status
+			FROM 
+				visitortrans t, visitormst v, invitedtl i, invitemst m
+			WHERE 
+				t.Id='$idvistrans' AND t.QRCode=i.QRCode AND t.VisitormstId=v.Id
+				AND m.Id=i.InvitemstId";
+		$query = $this->db->query($sql);
+		$result = $query->result_array();
+		return $result[0];
 	}
 
 	function _getVisitorTransDetail($idvistrans)
@@ -519,6 +542,13 @@ class Frontmenu extends CI_Controller
 		echo json_encode(['status' => 'success', 'message' => $file, 'qrcode' => 'test ok']);
 		
 	}
+
+	function _invcheckinpage($idvistrans)
+	{
+		$datadtl		= $this->_getInvVisitorDetail($idvistrans);
+		$data['data']	= $datadtl;		
+		$this->load->view('frontmenu/invcheckin_v', $data);
+	} 
 
 	public function checkin()
 	{

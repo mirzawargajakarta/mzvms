@@ -62,10 +62,10 @@
   	</div>
 
 <!-- test -->
-<br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+<!-- <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
 	  <a href="<?= base_url('visitregis/index/8c5efc4a9d54abd63b5d2ecbef707836');?>">
 				Test
-			</a>
+			</a> -->
 <!-- eo test -->
 
 </div>

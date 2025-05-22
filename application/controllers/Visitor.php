@@ -1,7 +1,7 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
-class Invite extends CI_Controller
+class Visitor extends CI_Controller
 {
     public function __construct()
     {
@@ -12,73 +12,13 @@ class Invite extends CI_Controller
 
     public function index()
     {        
-		$data['title'] = 'Event Invitation List';
+		$data['title'] = 'Visitment';
 
 		$this->load->view('templates/header', $data);
-		$this->load->view('invite/index_invite', $data);
+		$this->load->view('visiting/index_server_footer', $data);
 		$this->load->view('templates/foot', $data);
 		
     }
-
-	public function formadd()
-    {        
-		$data['title'] = 'Event Invitation Form';
-
-		$this->load->view('templates/header', $data);
-		$this->load->view('invite/invitationform', $data);
-		$this->load->view('templates/foot', $data);
-		
-    }
-
-	public function addproc()
-	{
-		$username			= $this->session->userdata('username');
-		$id_user 			= $this->session->userdata('id_user');
-
-		$submit				= $this->input->post('submit');
-		$tanggalevent		= $this->input->post('tanggalevent');
-		$eventname     		= $this->input->post('eventname');
-		$msg				= $this->input->post('msg');
-		$eventdescription	= $this->input->post('eventdescription');
-		
-	
-		$datamaster	= array(
-				'EventDate'		=> $tanggalevent,
-				'EventName'		=> $eventname,
-				'Description'	=> $eventdescription,
-				'InvMsg'		=> $msg
-		);
-	
-		$nama_arr	= $this->input->post('nama');
-		$wa_arr		= $this->input->post('wa');
-		$email_arr	= $this->input->post('email');
-	
-		if($submit) {
-			$this->db->trans_start();//----------------------------trans start
-
-			$this->db->insert('invitemst', $datamaster);
-
-			$idmst = $this->_getLastInsertedID();
-
-			for($i=0; $i<count($nama_arr); $i++) {
-
-				$linkurl	= md5($idmst.'id'.$i);
-
-				$datadetail	= array(
-						'InvitemstId'	=> $idmst,
-						'VisitorName'	=> $nama_arr[$i],
-						'VisitorWA'		=> $wa_arr[$i],
-						'VisitorEmail'	=> $email_arr[$i],
-						'LinkUrl'		=> $linkurl,
-				);
-				$this->db->insert('invitedtl', $datadetail);
-			}
-
-			$this->db->trans_complete();//-------------------------trans complete
-			$this->session->set_flashdata('flash', 'Event Invitation Added');
-			redirect('invite','refresh');		
-		}
-	}	
 
 	function _getDataIndex()
 	{
@@ -94,15 +34,18 @@ class Invite extends CI_Controller
 		return $result;
 	}
 
-	public function eventlist()
+	public function serverside_datatables()
 	{
 		$columns = array( 
 			0	=> 't.Id', 
-			1	=> 't.EventDate',
-			2	=> 't.EventName',
-			3	=> 't.Description',
-			4	=> 't.InvMsg',
-			5	=> 't.Status'
+			1	=> 't.HostName',
+			2	=> 'r.TargetVisitorType',
+			3	=> 'v.Nama',
+			4	=> 't.SourceCompany',
+			5	=> 's.SourceTypeName',
+			6   => 'v.PhoneNumber',
+			7	=> 'p.PurposeVisit',
+			8	=> 't.IsInv'
 		);
 
 		$draw	= $_POST['draw']; // digunakan oleh DataTables untuk memastikan bahwa Ajax kembali dari permintaan pemrosesan sisi server. biasanya menggunakan nilai int, seperti 1 yang artinya mengembalikan permintaan
@@ -112,14 +55,25 @@ class Invite extends CI_Controller
 		$dir 	= $_POST['order']['0']['dir']; // pengurutan secara ascending atau descending.
 		$search	= $_POST['search']['value']; // data pencarian.		
 
-		$query	= "SELECT t.Id, t.EventDate, DATE(NOW()) AS Today, t.EventName, t.Description, t.InvMsg, t.Status
-				FROM invitemst t ";
+		$query	= "SELECT 
+						t.Id, t.CheckInTime, t.CheckOutTime, t.IsInside, t.VisitormstId, 
+					t.SourceCompany, t.SourcetypemstId, t.HostName, t.TargettypemstId, 
+					t.PurposemstId, t.PVDescription, t.TempBody, t.AppointmentDate, 
+					t.StatusVisit, t.IsInv, t.QRCode, t.FileCI, t.FileCO, t.InvBy,
+					v.Nama, v.Gender, v.PhoneNumber, v.Email, 
+					v.Alamat, v.IDCard, v.FileIDCard,
+					p.PurposeVisit, s.SourceTypeName, r.TargetVisitorType
+				FROM 
+					visitortrans t, visitormst v, purposemst p, sourcetypemst s,
+					targettypemst r
+				WHERE t.VisitormstId=v.Id AND t.TargettypemstId=r.Id 
+					AND t.PurposemstId=p.Id AND t.SourcetypemstId=s.Id ";
 
 		$totalData	= $this->db->query($query)->num_rows();
 		$totalFiltered	= $totalData;
 
 		if($search != '') {
-			$query	.= " WHERE t.EventDate LIKE '%$search%' OR t.EventName LIKE '%$search%' OR t.Description LIKE '%$search%' OR t.InvMsg LIKE '%$search%' ";
+			$query	.= "AND (v.PhoneNumber LIKE '%$search%' OR t.HostName LIKE '%$search%' OR t.SourceCompany LIKE '%$search%') ";
 			$totalFiltered = $this->db->query($query)->num_rows();
 		}
 		$query .= "ORDER BY $order $dir LIMIT $limit OFFSET $start";
@@ -133,32 +87,29 @@ class Invite extends CI_Controller
             foreach($data_arr as $data) :
 				$no++;
 
-				$status	= $data['Status'];
-				$action	= "";
-				if($status=='0') {
-					$action	.= "<a href='#' class='send-msg btn btn-outline-primary' data-id='".$data['Id']."' data-content='".$data['EventName']."'><i class='fas fa-paper-plane' data-placement='bottom'></i></a>";
-				} else {
-					$action	.= "&nbsp;&nbsp;&nbsp;&nbsp;";
-				}
-
-				$action	.= "<a href='#' class='get-detail btn btn-outline-info' data-id='".$data['Id']."' data-toggle='modal' data-target='#get-detail'>
-								<i class='fas fa-eye pop' data-toggle='popover' data-placement='bottom' data-content='Detail'> </i>
-							</a>
-							<a href='".base_url('invite/edit/'. $data['Id'])."' class='btn btn-outline-warning'>
-								<i class='fas fa-edit pop' data-toggle='popover' data-placement='bottom' data-content='EDIT'></i>
-							</a>
-							<a href='#' data-id='".$data['Id']."' class='to-delete btn btn-outline-danger'>
-								<i class='fas fa-trash-alt pop' data-toggle='popover' data-placement='bottom' data-content='Delete'></i>
-							</a>";	
+				$action	= 
+				   "<a href='#' class='get-detail btn btn-outline-info' data-id='".$data['Id']."' data-toggle='modal' data-target='#get-detail'>
+						<i class='fas fa-eye pop' data-toggle='popover' data-placement='bottom' data-content='Detail'> </i>
+					</a>
+					<a href='".base_url('visiting/edit/'. $data['Id'])."' class='btn btn-outline-warning'>
+						<i class='fas fa-edit pop' data-toggle='popover' data-placement='bottom' data-content='EDIT'></i>
+					</a>
+					<a href='#' data-id='".$data['Id']."' class='to-delete btn btn-outline-danger'>
+						<i class='fas fa-trash-alt pop' data-toggle='popover' data-placement='bottom' data-content='Delete'></i>
+					</a>";	
 				
-				$isSent = ($data['Status']>0)?'Sent':'No';
+				$invitation= ($data['IsInv']>0)?$data['InvBy']:'No';
 
-				$nestedData['Action']			= $action;
-                $nestedData['No']				= "<p align='right'>".$data['Id']."&nbsp;</p>";
-                $nestedData['EventDate']		= $data['EventDate'];
-                $nestedData['EventName']		= $data['EventName'];
-				$nestedData['Description']		= $data['Description'];
-				$nestedData['IsSent']			= "<p align='center'>".$isSent."</p>";				
+				$nestedData['Action']				= $action;
+                $nestedData['No']					= "<p align='right'>".$data['Id']."&nbsp;</p>";
+                $nestedData['HostName']				= $data['HostName'];
+                $nestedData['SourceCompany']		= $data['SourceCompany'];
+				$nestedData['TargetVisitorType']	= "<p align='center'>".$data['TargetVisitorType']."</p>";
+				$nestedData['PurposeVisit']			= $data['PurposeVisit'];
+				$nestedData['Nama']					= $data['Nama'];
+				$nestedData['PhoneNumber']			= $data['PhoneNumber'];
+				$nestedData['SourceTypeName']		= $data['SourceTypeName'];
+				$nestedData['Invitation']			=  "<p align='center'>".$invitation."</p>";				
 
 				$datatables[] = $nestedData;
 			endforeach;
@@ -173,156 +124,13 @@ class Invite extends CI_Controller
 		echo json_encode($json_data); 
 	}
 
-	function _getLastInsertedID() {
-	    $sql    = "SELECT LAST_INSERT_ID() AS LastInsertedID";
-	    $qry    = $this->db->query($sql);
-	    $row    = $qry->result_array();
-	    return $row[0]['LastInsertedID'];
-	}
-
-	public function sendmsg()
-    {
-		$encode		= $this->input->get('mzvms');
-		$idmst		= urldecode($encode);
-		$datamst	= $this->_getInvMaster($idmst);
-		$datadtl	= $this->_getInvDetail($idmst);
-
-		$date	 	= $datamst['EventDate'];
-		$eventname 	= $datamst['EventName'];
-		$eventdesc 	= $datamst['Description'];
-		$msg_1	 	= $datamst['InvMsg'];
-
-		for ($i = 0; $i < count($datadtl); $i++) {
-			$notelp	= $datadtl[$i]['VisitorWA'];
-			$email	= $datadtl[$i]['VisitorEmail'];
-			$iddtl	= $datadtl[$i]['Id'];
-			$urlid	= $datadtl[$i]['LinkUrl'];
-			$linkurl = base_url('visitregis/index/'.$urlid);
-			if(strlen($notelp)>9) {	
-				$msg = $msg_1."\nPlease fill up the form to confirm in this link below\n".$linkurl;
-				$this->_sendWANoFile($notelp, $msg);
-			}
-			if(strlen($email)>6) {
-				$msg = "<html><body><p>".$msg_1."</p><p>Please fill up the form to confirm in this link below</p><br>".$linkurl."</body></html>";
-				$this->_sendEmail($email, $eventname, $msg);
-			}
-		}
-
-        $where	= ['Id' => $idmst];
-		$data	= ['status' => 1];
-		$this->Default_m->update('invitemst', $where, $data);
-		
-        if ($this->db->affected_rows() > 0) {
-        	redirect('invite');
-        }
-    }
-
-	public function hapus()
-    {
-		$encode	= $this->input->get('mzvms');
-		$id	= urldecode($encode);
-        $where = ['Id' => $id];
-        $this->Default_m->delete('invitemst', $where);
-
-		$wheredtl = ['InvitemstId' => $id];
-		$this->Default_m->delete('invitedtl', $wheredtl);
-        if ($this->db->affected_rows() > 0) {
-            redirect('invite');
-        }
-    }
-
 	public function detail($id)
 	{
 		$data['title']	= 'Detail=>'.$id;
-		$data['dataM']	= $this->_getInvMaster($id);
-		$data['dataD']	= $this->_getInvDetail($id);
-		$this->load->view('invite/detail_v', $data);
+		$data['data']	= $this->_getVisitorTransDetail($id);
+		$this->load->view('visiting/detail_v', $data);
 	}
 
-	function _getInvMaster($id)
-	{
-		$sql = "SELECT 	
-				t.Id, t.EventDate, t.EventName, t.Description, t.InvMsg, t.Status
-			FROM 
-				invitemst t
-			WHERE t.Id='$id'";
-		$query = $this->db->query($sql);
-		$result = $query->result_array();
-		return $result[0];
-	}
-
-	function _getInvDetail($id)
-	{
-		$sql = "SELECT 	
-				t.Id, t.InvitemstId, t.VisitorName, t.VisitorWA, t.VisitorEmail, 
-				t.StatusWA, t.StatusEmail, t.QRCode, t.LinkUrl
-			FROM 
-				invitedtl t
-			WHERE t.InvitemstId='$id'
-			ORDER BY t.Id";
-		$query = $this->db->query($sql);
-		$result = $query->result_array();
-		return $result;
-	}
-
-	function _sendWANoFile($nohp, $msg)
-	{
-		$curl = curl_init();
-
-		curl_setopt_array($curl, array(
-			CURLOPT_URL => 'https://app.saungwa.com/api/create-message',
-			CURLOPT_RETURNTRANSFER => true,
-			CURLOPT_ENCODING => '',
-			CURLOPT_MAXREDIRS => 10,
-			CURLOPT_TIMEOUT => 0,
-			CURLOPT_FOLLOWLOCATION => true,
-			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-			CURLOPT_CUSTOMREQUEST => 'POST',
-			CURLOPT_POSTFIELDS => array(
-				'appkey' => 'f1292ea6-5001-4a34-87e7-78dec18993df',
-				'authkey' => 'QmxImxBV4tKMSOXx3cXbklueFh1gnjLI3jANxscthSOJoqOq2S',
-				'to' => $nohp,
-				'message' => $msg,
-				'sandbox' => 'false'
-			),
-		));
-
-		// $response = curl_exec($curl);
-		curl_exec($curl);
-		curl_close($curl);
-		// echo $response;
-	}
-
-	function _sendEmail($sendto, $subject, $msg)
-	{
-		$config = [
-			'protocol'  => 'smtp',
-			'smtp_host' => 'smtp.googlemail.com',
-			'smtp_user' => 'admin@mzvms.online',
-			'smtp_pass' => 'qdll enqr yyap xdnk',
-			'smtp_port' => 465,
-			'smtp_crypto' => 'ssl',
-			'mailtype'  => 'html',
-			'charset'   => 'utf-8',
-			'newline'   => "\r\n"
-		];
-
-		$this->email->initialize($config);
-
-		$this->email->from("no-reply@mzvms.online", "MzVMS");
-		$this->email->to($sendto);
-
-		$this->email->subject($subject);
-		$this->email->message($msg);
-
-		if ($this->email->send()) {
-			return true;
-		} else {
-			echo $this->email->print_debugger();
-			die;
-		}
-	}
-    //----------------------------------------------- BELOM-----------
 	public function edit($id)
 	{
 		$data['title'] = 'Visitment Data Edit';
@@ -450,6 +258,29 @@ class Invite extends CI_Controller
 
 	}
 
+	function _getVisitorTransDetail($idvistrans)
+	{
+		$sql = "SELECT 	
+				t.Id, t.CheckInTime, t.CheckOutTime, t.IsInside, t.VisitormstId, 
+				DATE_FORMAT(t.CheckInTime,'%e %b %Y %l:%i %p') AS CheckInTimeIndFmt,
+				DATE_FORMAT(t.CheckOutTime,'%e %b %Y %l:%i %p') AS CheckOutTimeIndFmt,
+				t.SourceCompany, t.SourcetypemstId, t.HostName, t.TargettypemstId, 
+				t.PurposemstId, t.PVDescription, t.TempBody, t.AppointmentDate, 
+				t.StatusVisit, t.IsInv, t.QRCode, t.FileCI, t.FileCO,
+				v.Nama, v.Gender, v.PhoneNumber, v.Email, 
+				v.Alamat, v.IDCard, v.FileIDCard,
+				p.PurposeVisit, s.SourceTypeName, r.TargetVisitorType
+			FROM 
+				visitortrans t, visitormst v, purposemst p, sourcetypemst s,
+				targettypemst r
+			WHERE 
+				t.VisitormstId=v.Id AND t.SourcetypemstId=s.Id AND t.PurposemstId=p.Id 
+				AND t.TargettypemstId=r.Id AND t.Id='$idvistrans'";
+		$query = $this->db->query($sql);
+		$result = $query->result_array();
+		return $result[0];
+	}
+
     public function form($id_user = null)
     {
         if ($id_user) {
@@ -523,5 +354,25 @@ class Invite extends CI_Controller
         }
     }
 
-    
+    public function hapus()
+    {
+		$encode	= $this->input->get('mzvms');
+		$id	= urldecode($encode);
+        $where = ['Id' => $id];
+        $vms = $this->Default_m->getWhere('visitortrans', $where)->row();
+        unlink(FCPATH.'assets/uploads/checkin/' . $vms->FileCI);
+		unlink(FCPATH.'assets/uploads/checkout/' . $vms->FileCO);
+        $this->Default_m->delete('visitortrans', $where);
+        if ($this->db->affected_rows() > 0) {
+            redirect('visiting');
+        }
+    }
+
+    function getWhere()
+    {
+        $where = ['id_user' => $this->uri->segment(3)];
+        $on = 'tabel_profil.id_profil = tabel_user.id_profil';
+        $data['user'] = $this->Default_m->getWhereTwoTable('tabel_user', 'tabel_profil', $on, $where)->row();
+        $this->load->view('user/detail', $data);
+    }
 }
