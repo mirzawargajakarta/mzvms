@@ -126,13 +126,13 @@
 	$(document).ready(function() {
 		$("#checkout").focus();
 		
-		$('#checkoutForm').on('submit', function (e) {
+		$('#invcheckinForm').on('submit', function (e) {
 			e.preventDefault();
 			var idvistrans = $("#idvistrans").val();
 			var notelepon = $("#notelepon").val();
 			var image = $("#image").val();
 			$.ajax({
-				url: '<?= base_url("frontmenu/checkout");?>',
+				url: '<?= base_url("frontmenu/invcheckinproc");?>',
 				type: 'POST',
 				data: { 
 					idvistrans: idvistrans, 
@@ -144,7 +144,7 @@
 					if (res.status === 'success') {
 						Swal.fire({
 							icon: "success",
-							title: "Checked Out!",
+							title: "Checked In",
 							text: res.message
 						}).then((result) => {
 							if (result.isConfirmed) {
